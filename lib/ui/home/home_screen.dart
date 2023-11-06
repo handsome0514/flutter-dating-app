@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:bematched/constants/color.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:bematched/ui/name/name_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -57,7 +58,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       'Start',
                       style: TextStyle(fontSize: 20),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => NameScreen(),
+                        ),
+                      );
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: themeColor,
                       minimumSize: const Size.fromHeight(50),
