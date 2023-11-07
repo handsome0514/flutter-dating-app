@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:bematched/constants/color.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:form_field_validator/form_field_validator.dart';
-import 'package:bematched/ui/email/email_screen.dart';
+import 'package:bematched/ui/gender/gender_screen.dart';
 
 class EmailScreen extends StatefulWidget {
   @override
@@ -95,14 +95,14 @@ class _EmailScreenState extends State<EmailScreen> {
                             style: TextStyle(fontSize: 20),
                           ),
                           onPressed: () {
-                            if (formkey.currentState!.validate()) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => EmailScreen(),
-                                ),
-                              );
-                            }
+                            // if (formkey.currentState!.validate()) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => GenderScreen(),
+                              ),
+                            );
+                            // }
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: themeColor,
