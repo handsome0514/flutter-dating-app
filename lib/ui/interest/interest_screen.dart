@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:bematched/constants/color.dart';
-import 'package:bematched/ui/interest/interest_screen.dart';
 
-class PictureScreen extends StatefulWidget {
+class InterestScreen extends StatefulWidget {
   @override
-  _PictureScreenState createState() => _PictureScreenState();
+  _InterestScreenState createState() => _InterestScreenState();
 }
 
-class _PictureScreenState extends State<PictureScreen> {
+class _InterestScreenState extends State<InterestScreen> {
   @override
   void initState() {
     super.initState();
@@ -32,7 +31,7 @@ class _PictureScreenState extends State<PictureScreen> {
                   valueColor: AlwaysStoppedAnimation<Color>(
                     Colors.black,
                   ),
-                  value: 0.625,
+                  value: 0.75,
                 ),
                 SizedBox(
                   height: 25,
@@ -40,7 +39,7 @@ class _PictureScreenState extends State<PictureScreen> {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'Add 2 or more pictures and videos',
+                    'Your Interests',
                     textAlign: TextAlign.left,
                     style: TextStyle(
                         fontSize: 20,
@@ -120,7 +119,7 @@ class _PictureScreenState extends State<PictureScreen> {
                       height: 10,
                     ),
                     Text(
-                      '5 / 8',
+                      '6 / 8',
                       style: TextStyle(
                           fontSize: 20,
                           color: Colors.black,
