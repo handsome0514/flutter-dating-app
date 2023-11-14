@@ -1,3 +1,5 @@
+import 'package:bematched/utils/constants.dart';
+
 export 'package:flutter/material.dart';
 export 'package:google_fonts/google_fonts.dart';
 export 'package:get_storage/get_storage.dart';
@@ -13,7 +15,9 @@ export 'package:flutter_easyloading/flutter_easyloading.dart';
 export 'package:dropdown_button2/dropdown_button2.dart';
 export 'package:shared_preferences/shared_preferences.dart';
 export 'screens/index.dart';
-export 'common/index.dart';
 export 'widgets/index.dart';
 export 'utils/index.dart';
-export 'language/translations.dart';
+
+
+ImageAssets imageAssets = ImageAssets();
+SvgAssets svgAssets = SvgAssets();

@@ -1,11 +1,13 @@
+import 'package:bematched/screens/splash_screen/splash_screen.dart';
+import 'package:bematched/screens/welcome_screen/welcome_screen.dart';
+import 'package:bematched/utils/constants.dart';
+
 import 'config.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 
@@ -15,17 +17,20 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'BeMatched',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return GestureDetector(
+     onTap: () => FocusManager.instance.primaryFocus!.unfocus(),
+      child: GetMaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'BeMatched',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        defaultTransition: Transition.native,
+        locale: const Locale('en', 'US'),
+        translations: AppLanguage(),
+        builder: EasyLoading.init(),
+        home: SplashScreen(),
       ),
-      defaultTransition: Transition.native,
-      locale: const Locale('en', 'US'),
-      translations: Messages(),
-      builder: EasyLoading.init(),
-      home: const WelcomeScreen(),
     );
   }
 }

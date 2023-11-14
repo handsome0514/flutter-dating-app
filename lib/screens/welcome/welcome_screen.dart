@@ -19,9 +19,9 @@ class WelcomeScreenState extends State<WelcomeScreen> {
       backgroundColor: Colors.white,
       body: Center(
         child: Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             image: DecorationImage(
-              image: AssetImage("assets/images/home_bg.png"),
+              image: AssetImage(imageAssets.homeBG),
               fit: BoxFit.cover,
             ),
           ),
@@ -38,7 +38,7 @@ class WelcomeScreenState extends State<WelcomeScreen> {
                       color: Colors.white),
                 ),
                 Center(
-                  child: Image.asset("assets/images/logo.png"),
+                  child: Image.asset(imageAssets.logo),
                 ),
                 const SizedBox(
                   height: 10,
@@ -53,7 +53,8 @@ class WelcomeScreenState extends State<WelcomeScreen> {
                 ElevatedButton(
                     onPressed: () {
                       Get.to(
-                        () => const NameScreen(),
+                        // () => const NameScreen(),
+                        () => const HomeScreen(),
                       );
                     },
                     style: ElevatedButton.styleFrom(

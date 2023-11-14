@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.1.4 <4.0.0'
+  sdk: '>=3.0.0 <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -42,11 +42,12 @@ dependencies:
   firebase_core: ^2.22.0
   firebase_storage: ^11.5.0
   firebase_crashlytics: ^3.4.4
+  firebase_messaging:
 
   # UI related
-  google_fonts: ^4.0.3
+  google_fonts: ^6.1.0
   form_field_validator: ^1.0.1
-  intl: ^0.17.0
+  intl:
   get: ^4.6.6
   flutter_easyloading: ^3.0.5
   google_maps_flutter: ^2.5.0
@@ -58,6 +59,22 @@ dependencies:
   geolocator: ^10.1.0
   fade_shimmer: ^2.2.0
   dropdown_button2: ^2.3.9
+  blurrycontainer: ^1.0.2
+  expandable_text: ^2.3.0
+  video_player:
+  syncfusion_flutter_sliders: ^23.1.44
+  swipe_cards:
+  flutter_card_swiper: ^6.0.0
+  permission_handler:
+  flutter_native_image: ^0.0.6+1
+  device_info_plus:
+  images_picker: ^1.2.11
+  image_picker: ^1.0.2
+  adaptive_dialog:
+  location:
+  flutter_local_notifications: ^9.4.1
+
+
 
 dev_dependencies:
   flutter_test:
@@ -68,7 +85,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^2.0.0
+  flutter_lints: ^3.0.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -82,6 +99,37 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/
+    - assets/svgs/
+
+
+  fonts:
+    - family: Inter-Black
+      fonts:
+        - asset: fonts/Inter-Black.ttf
+    - family: Inter-Bold
+      fonts:
+        - asset: fonts/Inter-Bold.ttf
+    - family: Inter-ExtraBold
+      fonts:
+        - asset: fonts/Inter-ExtraBold.ttf
+    - family: Inter-ExtraLight
+      fonts:
+        - asset: fonts/Inter-ExtraLight.ttf
+    - family: Inter-Light
+      fonts:
+        - asset: fonts/Inter-Light.ttf
+    - family: Inter-Medium
+      fonts:
+        - asset: fonts/Inter-Medium.ttf
+    - family: Inter-Regular
+      fonts:
+        - asset: fonts/Inter-Regular.ttf
+    - family: Inter-SemiBold
+      fonts:
+        - asset: fonts/Inter-SemiBold.ttf
+    - family: Inter-Thin
+      fonts:
+        - asset: fonts/Inter-Thin.ttf
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

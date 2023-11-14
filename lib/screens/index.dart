@@ -1,9 +1,1 @@
-export 'auth/signup/birth/birth_screen.dart';
-export 'auth/signup/describe/describe_screen.dart';
-export 'auth/signup/email/email_screen.dart';
-export 'auth/signup/gender/gender_screen.dart';
-export 'auth/signup/interest/interest_screen.dart';
-export 'auth/signup/location/location_screen.dart';
-export 'auth/signup/name/name_screen.dart';
-export 'auth/signup/picture/picture_screen.dart';
-export 'welcome/welcome_screen.dart';
+
