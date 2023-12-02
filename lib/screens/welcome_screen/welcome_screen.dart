@@ -65,7 +65,7 @@ class WelcomeScreenState extends State<WelcomeScreen> {
                   AppLanguage.LOGIN,
                   style: GoogleFonts.abhayaLibre(
                     textStyle: const TextStyle(
-                      fontSize: 30,
+                      fontSize: 23,
                       color: AppColors.themeColor,
                       fontWeight: FontWeight.w500,
                     ),

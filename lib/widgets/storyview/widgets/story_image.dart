@@ -44,7 +44,6 @@ class ImageLoader {
         final imageBytes = fileResponse.file.readAsBytesSync();
 
         state = LoadState.success;
-
         PaintingBinding.instance.instantiateImageCodec(imageBytes).then(
             (codec) {
           frames = codec;

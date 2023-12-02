@@ -48,7 +48,10 @@ class BaseController //**************************************************
               insetPadding: EdgeInsets.zero,
               buttonPadding: EdgeInsets.zero,
               title: Center(
-                  child: CircularProgressIndicator(color: AppColors.themeColor,strokeWidth: 16,)),
+                  child: CircularProgressIndicator(
+                color: AppColors.themeColor,
+                strokeWidth: 5,
+              )),
             ),
           );
         });
@@ -76,7 +79,9 @@ class NativeProgress extends StatelessWidget {
     return Platform.isAndroid
         ? const Center(
             child: SizedBox(
-                height: 30, width: 30, child: CircularProgressIndicator(color: AppColors.themeColor)))
+                height: 30,
+                width: 30,
+                child: CircularProgressIndicator(color: AppColors.themeColor)))
         : Center(
             child: Theme(
                 data: ThemeData(
