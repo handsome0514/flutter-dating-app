@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import '../../../utils/constants.dart';
 
 class ResourcesScreen extends StatelessWidget {
-  const ResourcesScreen({Key? key}) : super(key: key);
+  const ResourcesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

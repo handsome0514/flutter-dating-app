@@ -18,6 +18,5 @@ export 'screens/index.dart';
 export 'widgets/index.dart';
 export 'utils/index.dart';
 
-
 ImageAssets imageAssets = ImageAssets();
 SvgAssets svgAssets = SvgAssets();

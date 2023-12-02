@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:bematched/screens/preview_screen.dart';
 import 'package:bematched/utils/constants.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -19,21 +22,21 @@ class AppCacheImage extends StatelessWidget {
   final bool? showSpinKit;
   final BoxFit? boxFit;
 
-  const AppCacheImage(
-      {Key? key,
-      required this.imageUrl,
-      required this.width,
-      required this.height,
-      this.round,
-      this.imageFailWidget,
-      this.showNative,
-      this.onTap,
-      this.marginHorizontal,
-      this.marginVertical,
-      this.showSpinKit = false,
-      this.boxFit,
-      this.opacity})
-      : super(key: key);
+  const AppCacheImage({
+    super.key,
+    required this.imageUrl,
+    required this.width,
+    required this.height,
+    this.round,
+    this.imageFailWidget,
+    this.showNative,
+    this.onTap,
+    this.marginHorizontal,
+    this.marginVertical,
+    this.showSpinKit = false,
+    this.boxFit,
+    this.opacity,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +51,7 @@ class AppCacheImage extends StatelessWidget {
     cacheWidth = cacheWidth < 50 ? 100 : cacheWidth;
     cacheHeight = cacheHeight < 50 ? 100 : cacheWidth;
 
-    print("cache width height $width,$height>>>$cacheWidth,$cacheHeight");
+    log("cache width height $width,$height>>>$cacheWidth,$cacheHeight");
     var widget = Container(
       margin: EdgeInsets.symmetric(
           horizontal: marginHorizontal ?? 0, vertical: marginVertical ?? 0),
@@ -80,20 +83,24 @@ class AppCacheImage extends StatelessWidget {
           fit: boxFit ?? BoxFit.cover,
           imageUrl: imageUrl,
           placeholder: (context, url) => SizedBox(
-              width: height,
-              height: height,
-              child: const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: NativeProgress(),
-              )),
+            width: height,
+            height: height,
+            child: const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: NativeProgress(),
+            ),
+          ),
           errorWidget: (context, url, error) =>
               imageFailWidget ?? const Icon(Icons.image),
         ),
       ),
     );
-    if (onTap == null) return widget;
     return GestureDetector(
-      onTap: onTap ?? () {},
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap ??
+          () {
+            //   Get.to(() => PreviewScreen(fileUrl: imageUrl),transition: Transition.rightToLeft);
+          },
       child: widget,
     );
   }

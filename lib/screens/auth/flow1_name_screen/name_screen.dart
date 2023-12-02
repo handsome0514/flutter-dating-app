@@ -1,14 +1,14 @@
 import 'package:bematched/screens/auth/flow1_name_screen/name_screen_controller.dart';
 import 'package:bematched/widgets/custom_button.dart';
 import 'package:bematched/widgets/custom_textfield.dart';
-import 'package:form_field_validator/form_field_validator.dart';
 import 'package:bematched/config.dart';
 
 import '../../../../utils/constants.dart';
-import '../flow2_email_screen/email_screen.dart';
 
 class NameScreen extends StatelessWidget {
-  NameScreen({super.key});
+  NameScreen({super.key, this.isBack});
+
+  final bool? isBack;
 
   final _controller = Get.put(NameScreenController());
 
@@ -45,7 +45,7 @@ class NameScreen extends StatelessWidget {
               const SizedBox(height: 25),
               CustomTextField(
                 hintLabel: 'Enter your name',
-                onChanged: (val) => _controller.name=val,
+                onChanged: (val) => _controller.name = val,
               ),
               const Spacer(),
               Column(
@@ -63,28 +63,35 @@ class NameScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: CustomButton(
-                          borderRadius: BorderRadius.circular(50),
-                          buttonLabel: 'Back',
-                          onTap: Get.back,
-                          borderColor: AppColors.themeColor,
-                          buttonColor: AppColors.whiteColor,
-                          textColor: AppColors.themeColor,
+                  if (isBack ?? false)
+                    Row(
+                      children: [
+                        Expanded(
+                          child: CustomButton(
+                            borderRadius: BorderRadius.circular(50),
+                            buttonLabel: 'Back',
+                            onTap: Get.back,
+                            borderColor: AppColors.themeColor,
+                            buttonColor: AppColors.whiteColor,
+                            textColor: AppColors.themeColor,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: CustomButton(
-                          borderRadius: BorderRadius.circular(50),
-                          buttonLabel: 'Next',
-                          onTap: _controller.setName,
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: CustomButton(
+                            borderRadius: BorderRadius.circular(50),
+                            buttonLabel: 'Next',
+                            onTap: _controller.setName,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    )
+                  else
+                    CustomButton(
+                      borderRadius: BorderRadius.circular(50),
+                      buttonLabel: 'Next',
+                      onTap: _controller.setName,
+                    ),
                 ],
               ),
             ],

@@ -6,9 +6,9 @@ import '../../../widgets/custom_button.dart';
 import 'change_password_screen_controller.dart';
 
 class ChangePasswordScreen extends StatelessWidget {
-  ChangePasswordScreen({Key? key}) : super(key: key);
+  ChangePasswordScreen({super.key});
 
-  ChangePasswordScreenController _controller =
+  final ChangePasswordScreenController _controller =
       Get.put(ChangePasswordScreenController());
 
   @override
@@ -18,24 +18,22 @@ class ChangePasswordScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: InkWell(
-          onTap: () {
-            Get.back();
-          },
+          onTap: Get.back,
           child: const Icon(
             Icons.arrow_back_ios,
-            color: AppColors.DARK_BLUE,
+            color: AppColors.themeColor,
             size: 20,
           ),
         ),
-        centerTitle: true,
         title: const Text(
           'Change Password',
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 18,
             fontFamily: AppFonts.INTER_SEMIBOLD,
-            color: AppColors.DARK_BLUE,
+            color: AppColors.BLACK,
           ),
         ),
+        centerTitle: true,
       ),
       body: LayoutBuilder(builder: (context, constraint) {
         return SingleChildScrollView(
@@ -61,6 +59,7 @@ class ChangePasswordScreen extends StatelessWidget {
                     const SizedBox(height: 8),
                     Obx(
                       () => TextFormField(
+                        onChanged: (val) => _controller.oldPassword = val,
                         style: const TextStyle(
                           fontSize: 16,
                           fontFamily: AppFonts.INTER_REGULAR,
@@ -81,7 +80,7 @@ class ChangePasswordScreen extends StatelessWidget {
                               color: AppColors.DARK_BLUE.withOpacity(.7),
                             ),
                           ),
-                          hintText: '********',
+                          hintText: 'Please enter current Password',
                           hintStyle: const TextStyle(
                             fontSize: 16,
                             fontFamily: AppFonts.INTER_REGULAR,
@@ -122,6 +121,7 @@ class ChangePasswordScreen extends StatelessWidget {
                     const SizedBox(height: 8),
                     Obx(
                       () => TextFormField(
+                        onChanged: (val) => _controller.newPassword = val,
                         style: const TextStyle(
                           fontSize: 16,
                           fontFamily: AppFonts.INTER_REGULAR,
@@ -142,7 +142,7 @@ class ChangePasswordScreen extends StatelessWidget {
                               color: AppColors.DARK_BLUE.withOpacity(.7),
                             ),
                           ),
-                          hintText: '********',
+                          hintText: 'Please enter new Password',
                           hintStyle: const TextStyle(
                             fontSize: 16,
                             fontFamily: AppFonts.INTER_REGULAR,
@@ -183,6 +183,7 @@ class ChangePasswordScreen extends StatelessWidget {
                     const SizedBox(height: 8),
                     Obx(
                       () => TextFormField(
+                        onChanged: (val) => _controller.confirmPassword = val,
                         style: const TextStyle(
                           fontSize: 16,
                           fontFamily: AppFonts.INTER_REGULAR,
@@ -203,7 +204,7 @@ class ChangePasswordScreen extends StatelessWidget {
                               color: AppColors.DARK_BLUE.withOpacity(.7),
                             ),
                           ),
-                          hintText: '********',
+                          hintText: 'Please enter confirm Password',
                           hintStyle: const TextStyle(
                             fontSize: 16,
                             fontFamily: AppFonts.INTER_REGULAR,
@@ -229,12 +230,28 @@ class ChangePasswordScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const Spacer(),
-                    SizedBox(height: 40),
-                    const CustomButton(
-                      buttonColor: AppColors.themeColor,
-                      textColor: AppColors.WHITE,
-                      buttonLabel: 'Update Password',
+                    const SizedBox(height: 37),
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: _controller.updatePassword,
+                      child: Container(
+                        padding: const EdgeInsets.only(top: 12.5, bottom: 12.5),
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: AppColors.themeColor,
+                        ),
+                        child: const Center(
+                          child: Text(
+                            'SUBMIT',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontFamily: AppFonts.INTER_MEDIUM,
+                              color: AppColors.whiteColor,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),

@@ -5,8 +5,8 @@ class SingleChildSpacerWidget extends StatelessWidget {
       {super.key, required this.child, this.scrollController});
 
   final Widget child;
- final ScrollController? scrollController;
- final ScrollController sController = ScrollController();
+  final ScrollController? scrollController;
+  final ScrollController sController = ScrollController();
 
   @override
   Widget build(BuildContext context) {

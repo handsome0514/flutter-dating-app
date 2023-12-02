@@ -1,71 +1,82 @@
 import 'package:bematched/models/user_model.dart';
-import 'package:bematched/screens/match_screen/match_screen.dart';
+import 'package:bematched/network_service/network_services.dart';
+import 'package:bematched/screens/admin_base_controller.dart';
+import 'package:bematched/screens/gallery_screen/gallery_screen.dart';
+import 'package:bematched/screens/home_screen/home_screen_controller.dart';
 import 'package:bematched/screens/profile_screen/profile_screen_controller.dart';
-import 'package:bematched/screens/setting_screens/settings_screen/setting_screen.dart';
 import 'package:bematched/utils/app_cache_image.dart';
+import 'package:bematched/utils/base_controller.dart';
 import 'package:bematched/utils/constants.dart';
+import 'package:bematched/widgets/profile_photos_widget.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../config.dart';
+import '../../models/thread_model.dart';
+import '../../utils/extension.dart';
+import '../../widgets/bio_button.dart';
+import '../../widgets/custom_dailogs.dart';
+import '../chat_screen/chat_screen.dart';
+import '../navbar_screen/navbar_screen_controller.dart';
 
 class ProfileScreen extends StatelessWidget {
-  ProfileScreen({super.key, this.isMyProfile, required this.userModel});
+  ProfileScreen({super.key, required this.userModel});
 
   final UserModel userModel;
 
-  final bool? isMyProfile;
-
-  final _controller = Get.put(ProfileScreenController());
+  final _homeController = Get.find<HomeScreenController>();
 
   @override
   Widget build(BuildContext context) {
+    final _controller = Get.put(ProfileScreenController(userModel));
     return Scaffold(
       backgroundColor: AppColors.whiteColor,
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Stack(
-              children: [
-                AppCacheImage(
-                  imageUrl: userModel.profileImage ?? '',
-                  width: double.infinity,
-                  height: Get.height / 2,
-                ),
-                if ((isMyProfile ?? false))
+        child: GetBuilder<ProfileScreenController>(
+          builder: (controller) => Column(
+            children: [
+              Stack(
+                children: [
+                  AppCacheImage(
+                    imageUrl: userModel.profileImage ?? '',
+                    width: double.infinity,
+                    height: Get.height / 2,
+                  ),
                   Positioned(
                     top: 45,
                     right: 20,
                     child: GestureDetector(
                       behavior: HitTestBehavior.opaque,
                       onTap: () {
-                        Get.to(() => SettingScreen(),
-                            transition: Transition.rightToLeft);
+                        CustomDailogs.userDetail(
+                          Get.context!,
+                          userModel: userModel,
+                        );
                       },
                       child: SvgPicture.asset(
-                        SvgAssets.SETTING_ICON,
-                        height: 30,
-                        width: 30,
+                        SvgAssets.LIST_ICON,
+                        height: 40,
+                        width: 40,
                         fit: BoxFit.cover,
-                        color: AppColors.BLACK,
+                        color: AppColors.whiteColor,
                       ),
                     ),
                   ),
-                Positioned(
-                  bottom: 0,
-                  child: Container(
-                    height: 80,
-                    width: Get.width,
-                    decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(30),
-                        topRight: Radius.circular(30),
+                  Positioned(
+                    bottom: 0,
+                    child: Container(
+                      height: 80,
+                      width: Get.width,
+                      decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(30),
+                          topRight: Radius.circular(30),
+                        ),
+                        color: AppColors.whiteColor,
                       ),
-                      color: AppColors.WHITE,
                     ),
                   ),
-                ),
-                if (!(isMyProfile ?? false))
                   Positioned.fill(
                     bottom: 35,
                     child: Align(
@@ -74,71 +85,112 @@ class ProfileScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         mainAxisSize: MainAxisSize.max,
                         children: [
-                          PhysicalModel(
-                            color: AppColors.themeColor.withOpacity(.1),
-                            borderRadius: BorderRadius.circular(37),
-                            elevation: 6,
-                            child: Container(
-                              height: 78,
-                              width: 78,
-                              decoration: BoxDecoration(
+                          if (!(AdminBaseController.userData.value
+                              .isMatched(userModel.uid!)))
+                            Padding(
+                              padding: const EdgeInsets.only(right: 20),
+                              child: PhysicalModel(
+                                color: AppColors.themeColor.withOpacity(.1),
                                 borderRadius: BorderRadius.circular(37),
-                                color: AppColors.WHITE,
-                              ),
-                              child: Center(
-                                child: SvgPicture.asset(SvgAssets.CLOSE_ICON),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 20),
-                          PhysicalModel(
-                            color: AppColors.themeColor.withOpacity(.1),
-                            borderRadius: BorderRadius.circular(37),
-                            elevation: 6,
-                            child: GestureDetector(
-                              onTap: () {
-                                Get.to(() => const MatchScreen());
-                              },
-                              child: Container(
-                                height: 99,
-                                width: 99,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(47.5),
-                                  color: AppColors.themeColor,
-                                ),
-                                child: Center(
-                                  child: SvgPicture.asset(
-                                    SvgAssets.HEART_ICON,
-                                    height: 36,
-                                    width: 42,
-                                    color: AppColors.whiteColor,
+                                elevation: 6,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Get.back();
+                                    Future.delayed(
+                                        const Duration(milliseconds: 500), () {
+                                      _homeController.swiperController
+                                          .swipeLeft();
+                                    });
+                                  },
+                                  child: Container(
+                                    height: 78,
+                                    width: 78,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(37),
+                                      color: AppColors.WHITE,
+                                    ),
+                                    child: Center(
+                                      child: SvgPicture.asset(
+                                          SvgAssets.CLOSE_ICON),
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 20),
-                          PhysicalModel(
-                            color: AppColors.themeColor.withOpacity(.1),
-                            borderRadius: BorderRadius.circular(37),
-                            elevation: 6,
-                            child: Container(
-                              height: 78,
-                              width: 78,
-                              decoration: BoxDecoration(
+                          if (!(AdminBaseController.userData.value
+                              .isMatched(userModel.uid!)))
+                            Padding(
+                              padding: const EdgeInsets.only(right: 20),
+                              child: PhysicalModel(
+                                color: AppColors.themeColor.withOpacity(.1),
                                 borderRadius: BorderRadius.circular(37),
-                                color: AppColors.WHITE,
-                              ),
-                              child: Center(
-                                child: SvgPicture.asset(SvgAssets.STAR_ICON),
+                                elevation: 6,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Get.back();
+                                    Future.delayed(
+                                        const Duration(milliseconds: 500), () {
+                                      _homeController.swiperController
+                                          .swipeRight();
+                                    });
+                                  },
+                                  child: Container(
+                                    height: 99,
+                                    width: 99,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(47.5),
+                                      color: AppColors.themeColor,
+                                    ),
+                                    child: Center(
+                                      child: SvgPicture.asset(
+                                        SvgAssets.SELECTED_HEART_ICON,
+                                        height: 36,
+                                        width: 42,
+                                        color: AppColors.whiteColor,
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
+                          if (!(AdminBaseController.userData.value.following
+                                  ?.contains(userModel.uid) ??
+                              false))
+                            PhysicalModel(
+                              color: AppColors.themeColor.withOpacity(.1),
+                              borderRadius: BorderRadius.circular(37),
+                              elevation: 6,
+                              child: GestureDetector(
+                                onTap: () {
+                                  var myProfile =
+                                      AdminBaseController.userData.value;
+                                  NetWorkServices.followUser(
+                                      myProfile, userModel);
+                                  Get.back();
+                                },
+                                child: Container(
+                                  height: 78,
+                                  width: 78,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(37),
+                                    color: AppColors.WHITE,
+                                  ),
+                                  child: Center(
+                                    child:
+                                        SvgPicture.asset(SvgAssets.STAR_ICON),
+                                  ),
+                                ),
+                              ),
+                            )
+                          else
+                            const SizedBox(
+                              height: 78,
+                              width: 78,
+                            )
                         ],
                       ),
                     ),
                   ),
-                if (!(isMyProfile ?? false))
                   Positioned(
                     top: 45,
                     left: 15,
@@ -162,27 +214,25 @@ class ProfileScreen extends StatelessWidget {
                       ),
                     ),
                   )
-              ],
-            ),
-            Container(
-              padding: const EdgeInsets.only(left: 18, right: 18),
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                color: AppColors.WHITE,
+                ],
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Column(
+              Container(
+                padding: const EdgeInsets.only(left: 18, right: 18),
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                  color: AppColors.WHITE,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                               Text(
+                              Text(
                                 '${userModel.name}, ${userModel.age}',
                                 style: const TextStyle(
                                   fontSize: 24,
@@ -190,51 +240,91 @@ class ProfileScreen extends StatelessWidget {
                                   color: AppColors.BLACK,
                                 ),
                               ),
-                         /*     Text(
-                                'Proffesional model',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontFamily: AppFonts.INTER_REGULAR,
-                                  color: AppColors.BLACK.withOpacity(.7),
+                              Padding(
+                                padding: const EdgeInsets.only(right: 16),
+                                child: Text(
+                                  userModel.work ?? '',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontFamily: AppFonts.INTER_REGULAR,
+                                    color: AppColors.BLACK.withOpacity(.7),
+                                  ),
                                 ),
-                              ),*/
+                              ),
                             ],
                           ),
-                          if ((isMyProfile ?? false))
-                            const Row(
-                              children: [
-                                SizedBox(width: 6),
-                                Icon(Icons.edit, color: AppColors.themeColor),
-                              ],
+                        ),
+                        if ((AdminBaseController.userData.value
+                            .isMatched(userModel.uid!)))
+                          GestureDetector(
+                            onTap: () async {
+                              final _baseController =
+                                  BaseController(Get.context, () {});
+                              try {
+                                var thread;
+
+                                var myProfile =
+                                    AdminBaseController.userData.value;
+                                _baseController.showProgress();
+                                var threadId = createThreadId(
+                                    userModel.uid!, myProfile.uid!);
+                                var doc = await FirebaseFirestore.instance
+                                    .collection(ThreadModel.TABLE_NAME)
+                                    .doc(threadId)
+                                    .get();
+                                if (doc.data() != null) {
+                                  thread = ThreadModel.fromJson(doc.data()!);
+                                  var userModel =
+                                      await NetWorkServices.getUserDetailById(
+                                          thread.participantUserList![0] ==
+                                                  AdminBaseController
+                                                      .userData.value.uid
+                                              ? thread.participantUserList![1]
+                                              : thread.participantUserList![0]);
+                                  if (userModel == null) return;
+                                  thread.userDetail = userModel;
+                                }
+
+                                Get.back();
+                                final ctrl = Get.find<NavBarScreenController>();
+                                ctrl.selectedIndex.value = 2;
+                                ctrl.update();
+                                _baseController.hideProgress();
+                                Get.to(
+                                  () => ChatScreen(threadModel: thread),
+                                  transition: Transition.rightToLeft,
+                                );
+                              } catch (e) {
+                                _baseController.hideProgress();
+                                print(e);
+                              }
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.only(
+                                  top: 15.5,
+                                  bottom: 15.5,
+                                  left: 16.39,
+                                  right: 16.39),
+                              decoration: BoxDecoration(
+                                border:
+                                    Border.all(color: const Color(0xffE8E6EA)),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: SvgPicture.asset(
+                                SvgAssets.SEND_ICON,
+                                color: AppColors.themeColor,
+                              ),
                             ),
-                        ],
-                      ),
-                      if (!(isMyProfile ?? false))
-                        Container(
-                          padding: const EdgeInsets.only(
-                              top: 15.5,
-                              bottom: 15.5,
-                              left: 16.39,
-                              right: 16.39),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: const Color(0xffE8E6EA)),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: SvgPicture.asset(
-                            SvgAssets.SEND_ICON,
-                            color: AppColors.themeColor,
-                          ),
-                        )
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
+                          )
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text(
                                 'Location',
@@ -244,30 +334,19 @@ class ProfileScreen extends StatelessWidget {
                                   color: AppColors.BLACK,
                                 ),
                               ),
-                              if ((isMyProfile ?? false))
-                                const Row(
-                                  children: [
-                                    SizedBox(width: 6),
-                                    Icon(
-                                      Icons.edit,
-                                      color: AppColors.themeColor,
-                                      size: 15,
-                                    ),
-                                  ],
+                              const SizedBox(height: 5),
+                              Text(
+                                userModel.location ?? '',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontFamily: AppFonts.INTER_REGULAR,
+                                  color: AppColors.BLACK.withOpacity(.7),
                                 ),
+                              ),
                             ],
                           ),
-                          Text(
-                            'Chicago, IL United States',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontFamily: AppFonts.INTER_REGULAR,
-                              color: AppColors.BLACK.withOpacity(.7),
-                            ),
-                          ),
-                        ],
-                      ),
-                      if (!(isMyProfile ?? false))
+                        ),
+                        const SizedBox(width: 15),
                         Container(
                           padding: const EdgeInsets.only(
                               top: 13, bottom: 13, left: 15.5, right: 15.5),
@@ -275,14 +354,14 @@ class ProfileScreen extends StatelessWidget {
                             color: AppColors.themeColor.withOpacity(.2),
                             borderRadius: BorderRadius.circular(7),
                           ),
-                          child: const Row(
+                          child: Row(
                             children: [
-                              Icon(Icons.location_pin,
+                              const Icon(Icons.location_pin,
                                   color: AppColors.themeColor, size: 16),
-                              SizedBox(width: 8.72),
+                              const SizedBox(width: 8.72),
                               Text(
-                                '5 Km',
-                                style: TextStyle(
+                                '${userModel.distance} Km',
+                                style: const TextStyle(
                                   fontSize: 12,
                                   fontFamily: AppFonts.INTER_BOLD,
                                   color: AppColors.themeColor,
@@ -291,213 +370,308 @@ class ProfileScreen extends StatelessWidget {
                             ],
                           ),
                         )
-                    ],
-                  ),
-                  const SizedBox(height: 28),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Text(
-                            'About',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontFamily: AppFonts.INTER_BOLD,
-                              color: AppColors.BLACK,
-                            ),
-                          ),
-                          if ((isMyProfile ?? false))
-                            const Row(
-                              children: [
-                                SizedBox(width: 6),
-                                Icon(
-                                  Icons.edit,
-                                  color: AppColors.themeColor,
-                                  size: 15,
-                                ),
-                              ],
-                            ),
-                        ],
-                      ),
-                      const SizedBox(height: 5),
-                      Padding(
-                        padding: EdgeInsets.only(right: Get.width * 0.25),
-                        child: ExpandableText(
-                          'My name is Jessica Parker and I enjoy meeting new people and finding ways to help them have an uplifting experience. I enjoy reading',
-                          expandText: 'show more',
-                          collapseText: 'show less',
-                          maxLines: 3,
-                          linkColor: AppColors.themeColor,
-                          linkStyle: const TextStyle(
-                            fontSize: 12,
-                            fontFamily: AppFonts.INTER_SEMIBOLD,
-                            color: AppColors.themeColor,
-                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 28),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'About',
                           style: TextStyle(
-                            fontSize: 14,
-                            fontFamily: AppFonts.INTER_REGULAR,
-                            color: AppColors.BLACK.withOpacity(.7),
+                            fontSize: 16,
+                            fontFamily: AppFonts.INTER_BOLD,
+                            color: AppColors.BLACK,
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 25),
-                      Row(
-                        children: [
-                          const Text(
-                            'Interests',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontFamily: AppFonts.INTER_BOLD,
-                              color: AppColors.BLACK,
-                            ),
-                          ),
-                          if ((isMyProfile ?? false))
-                            const Row(
-                              children: [
-                                SizedBox(width: 6),
-                                Icon(
-                                  Icons.edit,
-                                  color: AppColors.themeColor,
-                                  size: 15,
-                                ),
-                              ],
-                            ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      Wrap(
-                        spacing: 12,
-                        runSpacing: 15,
-                        direction: Axis.horizontal,
-                        children: List.generate(
-                          5,
-                          (i) => Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              border:
-                                  Border.all(color: const Color(0xFFD9D9D9)),
-                              borderRadius: const BorderRadius.all(
-                                Radius.circular(10),
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  interests[i]["icon"],
-                                  color: AppColors.themeColor,
-                                  size: 25,
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  interests[i]["text"],
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w500),
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 26),
-                      const Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Gallery',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontFamily: AppFonts.INTER_BOLD,
-                              color: AppColors.BLACK,
-                            ),
-                          ),
-                          Text(
-                            'See all',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontFamily: AppFonts.INTER_BOLD,
+                        const SizedBox(height: 5),
+                        Padding(
+                          padding: EdgeInsets.only(right: Get.width * 0.25),
+                          child: ExpandableText(
+                            userModel.bios ?? '',
+                            expandText: 'show more',
+                            collapseText: 'show less',
+                            maxLines: 3,
+                            linkColor: AppColors.themeColor,
+                            linkStyle: const TextStyle(
+                              fontSize: 12,
+                              fontFamily: AppFonts.INTER_SEMIBOLD,
                               color: AppColors.themeColor,
                             ),
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontFamily: AppFonts.INTER_REGULAR,
+                              color: AppColors.BLACK.withOpacity(.7),
+                            ),
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Container(
-                              height: 190,
+                        ),
+                        const SizedBox(height: 25),
+                        const Text(
+                          'Interests',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: AppFonts.INTER_BOLD,
+                            color: AppColors.BLACK,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Wrap(
+                          spacing: 12,
+                          runSpacing: 15,
+                          direction: Axis.horizontal,
+                          children: List.generate(
+                            userModel.interest?.length ?? 0,
+                            (i) => Container(
+                              padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5),
-                                image: const DecorationImage(
-                                  image: AssetImage(
-                                    ImageAssets.GIRL_IMAGE,
-                                  ),
-                                  fit: BoxFit.fitWidth,
+                                color: Colors.white,
+                                border: Border.all(color: AppColors.themeColor),
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(10),
                                 ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    interests[userModel.interest?[i]]["icon"],
+                                    color: AppColors.themeColor,
+                                    size: 25,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    interests[userModel.interest?[i]]["text"],
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      color: AppColors.themeColor,
+                                    ),
+                                  )
+                                ],
                               ),
                             ),
                           ),
-                          const SizedBox(width: 13),
-                          Expanded(
-                            child: Container(
-                              height: 190,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5),
-                                image: const DecorationImage(
-                                  image: AssetImage(
-                                    ImageAssets.GIRL_IMAGE,
+                        ),
+                        const SizedBox(height: 26),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Column(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.only(bottom: 16),
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                        bottom: BorderSide(
+                                            color: const Color(0xffE4E4E4)
+                                                .withOpacity(.55))),
                                   ),
-                                  fit: BoxFit.fitWidth,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Container(
-                              height: 190,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5),
-                                image: const DecorationImage(
-                                  image: AssetImage(
-                                    ImageAssets.GIRL_IMAGE,
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Text(
+                                        'Work',
+                                        style: TextStyle(
+                                          fontSize: 17,
+                                          fontFamily: AppFonts.INTER_MEDIUM,
+                                          color: AppColors.BLACK,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 160,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            if (_controller.userModel.work
+                                                    ?.isNotEmpty ??
+                                                false)
+                                              Expanded(
+                                                child: Text(
+                                                  _controller.userModel.work ??
+                                                      '',
+                                                  style: const TextStyle(
+                                                    fontSize: 16,
+                                                    fontFamily:
+                                                        AppFonts.INTER_MEDIUM,
+                                                    color: AppColors.themeColor,
+                                                  ),
+                                                ),
+                                              )
+                                            else
+                                              const Expanded(
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.end,
+                                                  children: [
+                                                    Text(
+                                                      'Add',
+                                                      style: TextStyle(
+                                                        fontSize: 16,
+                                                        fontFamily: AppFonts
+                                                            .INTER_MEDIUM,
+                                                        color: AppColors
+                                                            .themeColor,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            const SizedBox(width: 13),
+                                            Transform.flip(
+                                              flipX: true,
+                                              child: const Icon(
+                                                Icons.arrow_back_ios_new,
+                                                color: AppColors.themeColor,
+                                                size: 18,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  fit: BoxFit.fitWidth,
                                 ),
-                              ),
+                                const SizedBox(height: 17),
+                              ],
                             ),
-                          ),
-                          const SizedBox(width: 13),
-                          Expanded(
-                            child: Container(
-                              height: 190,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5),
-                                image: const DecorationImage(
-                                  image: AssetImage(
-                                    ImageAssets.GIRL_IMAGE,
-                                  ),
-                                  fit: BoxFit.fitWidth,
-                                ),
+                            if ((_controller.userModel.connectionStatus ?? 0) ==
+                                    0 &&
+                                (_controller.userModel.height?.isNotEmpty ??
+                                    false))
+                              Column(
+                                children: [
+                                  BioButton(
+                                      leading: 'Height',
+                                      suffix: _controller.userModel.height ??
+                                          'Add'),
+                                  const SizedBox(height: 17),
+                                ],
                               ),
+                            if (_controller
+                                    .userModel.educationLevel?.isNotEmpty ??
+                                false)
+                              Column(
+                                children: [
+                                  BioButton(
+                                      leading: 'Education level',
+                                      suffix: _controller
+                                              .userModel.educationLevel ??
+                                          'Add'),
+                                  const SizedBox(height: 17),
+                                ],
+                              ),
+                            if ((_controller.userModel.connectionStatus ?? 0) ==
+                                    0 ||
+                                (_controller.userModel.connectionStatus ?? 0) ==
+                                        1 &&
+                                    (_controller
+                                            .userModel.drinking?.isNotEmpty ??
+                                        false))
+                              Column(
+                                children: [
+                                  BioButton(
+                                      leading: 'Drinking',
+                                      suffix: _controller.userModel.drinking ??
+                                          'Add'),
+                                  const SizedBox(height: 17),
+                                ],
+                              ),
+                            if ((_controller.userModel.connectionStatus ?? 0) ==
+                                    0 ||
+                                (_controller.userModel.connectionStatus ?? 0) ==
+                                        1 &&
+                                    (_controller
+                                            .userModel.smoking?.isNotEmpty ??
+                                        false))
+                              Column(
+                                children: [
+                                  BioButton(
+                                      leading: 'Smoking',
+                                      suffix: _controller.userModel.smoking ??
+                                          'Add'),
+                                  const SizedBox(height: 17),
+                                ],
+                              ),
+                            if ((_controller.userModel.connectionStatus ?? 0) ==
+                                    0 &&
+                                (_controller
+                                        .userModel.relationship?.isNotEmpty ??
+                                    false))
+                              Column(
+                                children: [
+                                  BioButton(
+                                      leading: 'Relationship',
+                                      suffix:
+                                          _controller.userModel.relationship ??
+                                              'Add'),
+                                  const SizedBox(height: 17),
+                                ],
+                              ),
+                            if (_controller.userModel.industry?.isNotEmpty ??
+                                false)
+                              Column(
+                                children: [
+                                  BioButton(
+                                      leading: 'Industry',
+                                      suffix: _controller.userModel.industry ??
+                                          'Add'),
+                                  const SizedBox(height: 17),
+                                ],
+                              ),
+                            if ((_controller.userModel.connectionStatus ?? 0) ==
+                                    2 &&
+                                (_controller.userModel.yearsOfExperience
+                                        ?.isNotEmpty ??
+                                    false))
+                              Column(
+                                children: [
+                                  BioButton(
+                                      leading: 'Years of experience',
+                                      suffix: _controller
+                                              .userModel.yearsOfExperience ??
+                                          'Add'),
+                                  const SizedBox(height: 17),
+                                ],
+                              ),
+                            if ((_controller.userModel.connectionStatus ?? 0) ==
+                                    0 ||
+                                (_controller.userModel.connectionStatus ?? 0) ==
+                                        1 &&
+                                    (_controller
+                                            .userModel.zodiacSign?.isNotEmpty ??
+                                        false))
+                              Column(
+                                children: [
+                                  BioButton(
+                                      leading: 'Zodiac sign',
+                                      suffix:
+                                          _controller.userModel.zodiacSign ??
+                                              'Add'),
+                                ],
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 26),
+                        ProfilePhotosWidget(
+                          photosPattern: const [230.13, 204.13, 230.13, 204.13],
+                          images: userModel.images ?? [],
+                          seeAllClicked: () => Get.to(
+                            () => GalleryScreen(
+                              userModel: userModel,
+                              isMyProfile: false,
                             ),
+                            transition: Transition.rightToLeft,
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 41),
-                    ],
-                  ),
-                ],
-              ),
-            )
-          ],
+                        ),
+                        const SizedBox(height: 41),
+                      ],
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

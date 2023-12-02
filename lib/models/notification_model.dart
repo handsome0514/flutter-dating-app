@@ -15,7 +15,6 @@ class NotificationModel {
   static const int SUPER_LIKE = INVITE_NOTIFICATION + 1;
   static const int ACCOUNT_BLOCKED = SUPER_LIKE + 1;
 
-  @override
   NotificationModel fromJson(Map<String, dynamic> json,
       {bool isFromList = false}) {
     id = json["id"];
@@ -30,7 +29,6 @@ class NotificationModel {
     return this;
   }
 
-  @override
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = id;

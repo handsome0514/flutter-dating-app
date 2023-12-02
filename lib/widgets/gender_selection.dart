@@ -17,14 +17,15 @@ class GenderSelection extends StatelessWidget {
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.only(top: 16,bottom: 18,left: 26,right: 16),
+        padding:
+            const EdgeInsets.only(top: 16, bottom: 18, left: 26, right: 16),
         decoration: BoxDecoration(
-            color: isSelected ? AppColors.themeColor : Colors.white,
-            border: Border.all(
-                color: isSelected
-                    ? AppColors.themeColor
-                    : const Color(0xFFD9D9D9)),
-            borderRadius: BorderRadius.circular(10)),
+          color: isSelected ? AppColors.themeColor : Colors.white,
+          border: Border.all(
+            color: isSelected ? AppColors.themeColor : const Color(0xFFD9D9D9),
+          ),
+          borderRadius: BorderRadius.circular(10),
+        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [

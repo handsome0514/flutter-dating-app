@@ -1,6 +1,13 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
+import 'package:bematched/models/comment_model.dart';
+import 'package:bematched/models/story_model.dart';
+import 'package:bematched/models/user_model.dart';
+import 'package:bematched/screens/admin_base_controller.dart';
+import 'package:bematched/utils/app_cache_image.dart';
+import 'package:bematched/utils/extension.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -37,27 +44,11 @@ class StoryItem {
 
   /// The page content
   final Widget view;
-  String? location;
-  String? caption;
-  String? emojiPath;
-  String? tags;
-  String? date;
-  String? time;
-  int? mediaid;
-  int? postid;
 
   StoryItem(
     this.view, {
     required this.duration,
     this.shown = false,
-    this.mediaid,
-    this.caption,
-    this.emojiPath,
-    this.tags,
-    this.date,
-    this.time,
-    this.postid,
-    this.location,
   });
 
   /// Short hand to create text-only page.
@@ -237,49 +228,6 @@ class StoryItem {
 
   /// Shorthand for creating page video. [controller] should be same instance as
   /// one passed to the `StoryView`
-  factory StoryItem.pageVideo(
-    File file, {
-    required StoryController controller,
-    Key? key,
-    Duration? duration,
-    BoxFit imageFit = BoxFit.fitWidth,
-    String? location,
-    String? caption,
-    String? emojiPath,
-    String? tags,
-    String? date,
-    String? time,
-    int? mediaid,
-    int? postid,
-    bool shown = false,
-    Map<String, dynamic>? requestHeaders,
-  }) {
-    return StoryItem(
-      Container(
-        key: key,
-        color: Colors.black,
-        child: Stack(
-          children: <Widget>[
-            StoryVideo.file(
-              file,
-              controller: controller,
-              requestHeaders: requestHeaders,
-            ),
-          ],
-        ),
-      ),
-      shown: shown,
-      duration: duration ?? const Duration(seconds: 10),
-      caption: caption,
-      emojiPath: emojiPath,
-      tags: tags,
-      date: date,
-      time: time,
-      mediaid: mediaid,
-      postid: postid,
-      location: location,
-    );
-  }
 
   /// Shorthand for creating a story item from an image provider such as `AssetImage`
   /// or `NetworkImage`. However, the story continues to play while the image loads
@@ -394,6 +342,7 @@ class StoryItem {
 class StoryView extends StatefulWidget {
   /// The pages to displayed.
   final List<StoryItem?> storyItems;
+  final StoryModel storyModel;
 
   /// Callback for when a full cycle of story is shown. This will be called
   /// each time the full story completes when [repeat] is set to `true`.
@@ -436,6 +385,7 @@ class StoryView extends StatefulWidget {
     this.inline = false,
     this.onVerticalSwipeComplete,
     this.indicatorColor = Colors.white,
+    required this.storyModel,
   });
 
   @override
@@ -453,56 +403,12 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
 
   VerticalDragInfo? verticalDragInfo;
 
+  StoryModel get currentStoryModel {
+    return widget.storyModel;
+  }
+
   StoryItem? get _currentStory {
     return widget.storyItems.firstWhereOrNull((it) => !it!.shown);
-  }
-
-  String get location {
-    var item = widget.storyItems.firstWhereOrNull((it) => !it!.shown);
-    item ??= widget.storyItems.last;
-    return item?.location ?? '';
-  }
-
-  String get caption {
-    var item = widget.storyItems.firstWhereOrNull((it) => !it!.shown);
-    item ??= widget.storyItems.last;
-    return item?.caption ?? '';
-  }
-
-  String get emojiPath {
-    var item = widget.storyItems.firstWhereOrNull((it) => !it!.shown);
-    item ??= widget.storyItems.last;
-    return item?.emojiPath ?? '';
-  }
-
-  String get tags {
-    var item = widget.storyItems.firstWhereOrNull((it) => !it!.shown);
-    item ??= widget.storyItems.last;
-    return item?.tags ?? '';
-  }
-
-  String get date {
-    var item = widget.storyItems.firstWhereOrNull((it) => !it!.shown);
-    item ??= widget.storyItems.last;
-    return item?.date ?? '';
-  }
-
-  String get time {
-    var item = widget.storyItems.firstWhereOrNull((it) => !it!.shown);
-    item ??= widget.storyItems.last;
-    return item?.time ?? '';
-  }
-
-  int get postId {
-    var item = widget.storyItems.firstWhereOrNull((it) => !it!.shown);
-    item ??= widget.storyItems.last;
-    return item?.postid ?? -1;
-  }
-
-  int get mediaId {
-    var item = widget.storyItems.firstWhereOrNull((it) => !it!.shown);
-    item ??= widget.storyItems.last;
-    return item?.mediaid ?? -1;
   }
 
   Widget get _currentView {
@@ -687,6 +593,7 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
   Rx<bool> isText = Rx(true);
 
   FocusNode focusNode = FocusNode();
+  TextEditingController commentController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -852,22 +759,18 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
                             children: [
                               Row(
                                 children: [
-                                  Container(
-                                    height: 48,
+                                  AppCacheImage(
+                                    imageUrl: currentStoryModel
+                                            .userDetail?.profileImage ??
+                                        '',
                                     width: 48,
-                                    decoration: const BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      image: DecorationImage(
-                                        image:
-                                            AssetImage(ImageAssets.GIRL_IMAGE),
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
+                                    height: 48,
+                                    round: 24,
                                   ),
                                   const SizedBox(width: 10),
-                                  const Text(
-                                    'Annabelle',
-                                    style: TextStyle(
+                                  Text(
+                                    currentStoryModel.userDetail?.name ?? '',
+                                    style: const TextStyle(
                                         fontFamily: AppFonts.INTER_BOLD,
                                         color: AppColors.whiteColor,
                                         fontSize: 16),
@@ -901,45 +804,59 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
                           child: Padding(
                             padding: const EdgeInsets.only(
                                 bottom: 17, left: 22, right: 13),
-                            child: GestureDetector(
-                              behavior: HitTestBehavior.opaque,
-                              onTap: () {},
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: TextFormField(
-                                      focusNode: focusNode,
-                                      decoration: InputDecoration(
-                                          fillColor: AppColors.whiteColor
-                                              .withOpacity(.2),
-                                          filled: true,
-                                          border: OutlineInputBorder(
-                                            borderSide: const BorderSide(
-                                              color: AppColors.whiteColor,
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(15),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: TextFormField(
+                                    controller: commentController,
+                                    focusNode: focusNode,
+                                    decoration: InputDecoration(
+                                        fillColor: AppColors.whiteColor
+                                            .withOpacity(.2),
+                                        filled: true,
+                                        border: OutlineInputBorder(
+                                          borderSide: const BorderSide(
+                                            color: AppColors.whiteColor,
                                           ),
-                                          enabledBorder: OutlineInputBorder(
-                                            borderSide: const BorderSide(
-                                              color: AppColors.whiteColor,
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(15),
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                        ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderSide: const BorderSide(
+                                            color: AppColors.whiteColor,
                                           ),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderSide: const BorderSide(
-                                              color: AppColors.whiteColor,
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(15),
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderSide: const BorderSide(
+                                            color: AppColors.whiteColor,
                                           ),
-                                          contentPadding: const EdgeInsets.only(
-                                              top: 13, bottom: 12)),
-                                    ),
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                        ),
+                                        contentPadding: const EdgeInsets.only(
+                                            top: 13, bottom: 12,left: 13,right: 13)),
                                   ),
-                                  const SizedBox(width: 19),
-                                  Container(
+                                ),
+                                const SizedBox(width: 19),
+                                GestureDetector(
+                                  behavior: HitTestBehavior.opaque,
+                                  onTap: () {
+                                    if (commentController.text.isEmpty) return;
+                                    var uid = generateRandomString(15);
+                                    var userId =
+                                        AdminBaseController.userData.value.uid;
+                                    CommentModel commentModel = CommentModel()
+                                      ..id = uid
+                                      ..senderId = userId
+                                      ..message = commentController.text
+                                      ..messageTime = Timestamp.now();
+                                    commentModel.addNewComment(
+                                        currentStoryModel.id ?? '');
+                                    commentController.clear();
+                                  },
+                                  child: Container(
                                     padding: const EdgeInsets.only(
                                         top: 16.5,
                                         bottom: 14,
@@ -958,9 +875,9 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
                                       width: 20,
                                       fit: BoxFit.scaleDown,
                                     ),
-                                  )
-                                ],
-                              ),
+                                  ),
+                                )
+                              ],
                             ),
                           ),
                         ),

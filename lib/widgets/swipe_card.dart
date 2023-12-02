@@ -1,13 +1,8 @@
 import 'package:blurrycontainer/blurrycontainer.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 import '../config.dart';
 import '../utils/constants.dart';
-
-
-
-
 
 class SwipeCard extends StatelessWidget {
   const SwipeCard({super.key, required this.image});
@@ -16,14 +11,14 @@ class SwipeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(left: 24, right: 24,bottom: 9),
+      margin: const EdgeInsets.only(left: 24, right: 24, bottom: 9),
       child: Stack(
         children: [
           Container(
             margin: const EdgeInsets.only(top: 18),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
-              image:  DecorationImage(
+              image: DecorationImage(
                 image: AssetImage(image),
                 fit: BoxFit.cover,
               ),
@@ -59,7 +54,8 @@ class SwipeCard extends StatelessWidget {
           Positioned(
             top: 0,
             left: 1,
-            child: Row(crossAxisAlignment: CrossAxisAlignment.end,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Container(
                   height: 74,
@@ -67,8 +63,7 @@ class SwipeCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: const Color(0xffC4C4C4).withOpacity(.23),
                     borderRadius: BorderRadius.circular(37),
-                    border: Border.all(
-                        color: AppColors.whiteColor, width: 3),
+                    border: Border.all(color: AppColors.whiteColor, width: 3),
                     image: const DecorationImage(
                       image: AssetImage(ImageAssets.homeBG),
                       fit: BoxFit.cover,

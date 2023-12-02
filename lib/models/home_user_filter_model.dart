@@ -2,31 +2,32 @@ import 'dart:convert';
 import '../utils/data_cache.dart';
 
 class HomeFilterModel {
-  List<int>? lookingFor;
-  List<int>? interestedIn;
+  List<int>? selectedLanguage;
+  int? interestedIn;
   int? distance;
   Age? age;
-  bool? usePostCode;
+  bool? useLocation;
 
-  HomeFilterModel({this.lookingFor, this.distance, this.age});
+
+  HomeFilterModel({this.distance, this.age});
 
   HomeFilterModel.fromJson(Map<String, dynamic> json) {
-    lookingFor = json['looking_for']?.cast<int>() ?? [];
-    interestedIn = json['interested_in']?.cast<int>() ?? [];
+    selectedLanguage = json['selectedLanguage']?.cast<int>() ?? [];
+    interestedIn = json['interested_in']??0;
     distance = json['distance'];
-    usePostCode = json['use_post_code'] ?? false;
     age = json['age'] != null ? Age.fromJson(json['age']) : null;
+    useLocation = json['useLocation']??true;
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['looking_for'] = lookingFor;
+    data['selectedLanguage'] = selectedLanguage;
     data['interested_in'] = interestedIn;
     data['distance'] = distance;
-    data['use_post_code'] = usePostCode;
     if (age != null) {
       data['age'] = age!.toJson();
     }
+    data['useLocation'] = useLocation;
     return data;
   }
 
@@ -49,16 +50,15 @@ class HomeFilterModel {
       ..start = 18
       ..end = 30;
     var filter = HomeFilterModel()
-      ..distance = 100
-      ..lookingFor = [0, 1, 2, 3, 4]
-      ..interestedIn = [0, 1, 2, 3]
+      ..distance = 50
+      ..interestedIn = 0
       ..age = age;
     filter.update();
   }
 
   @override
   String toString() {
-    return 'UserFilterModel{lookingFor: $lookingFor, distance: $distance, age: $age}';
+    return 'UserFilterModel{distance: $distance, age: $age}';
   }
 }
 
@@ -74,7 +74,7 @@ class Age {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['start'] = this.start;
     data['end'] = this.end;
     return data;

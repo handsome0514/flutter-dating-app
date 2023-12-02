@@ -1,4 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../config.dart';
+import '../screens/admin_base_controller.dart';
+import '../utils/base_controller.dart';
+import 'chat_model.dart';
 import 'user_model.dart';
 
 class ThreadModel {
@@ -13,8 +17,7 @@ class ThreadModel {
   String? fileUrl;
   bool? isPending;
   bool? isBlocked;
-  List<dynamic>? mutedList;
-  List<dynamic>? showImagesUserList;
+
 
   static String TABLE_NAME = "threads";
 
@@ -31,8 +34,7 @@ class ThreadModel {
     fileUrl = json['file_url'];
     isPending = json['is_pending'] ?? false;
     isBlocked = json['is_blocked'] ?? false;
-    mutedList = json['muted_list'] ?? [];
-    showImagesUserList = json['show_images_user_list'] ?? [];
+
   }
 
   Map<String, dynamic> toJson() {
@@ -49,10 +51,54 @@ class ThreadModel {
     if (fileUrl != null) data['file_url'] = fileUrl;
     data['is_pending'] = isPending ?? false;
     data['is_blocked'] = isBlocked ?? false;
-    data['muted_list'] = mutedList ?? [];
-    data["show_images_user_list"] = showImagesUserList ?? [];
     return data;
   }
+
+
+
+  void readMessage() async {
+    try {
+      if (senderId != AdminBaseController.userData.value.uid) {
+        await FirebaseFirestore.instance
+            .collection(TABLE_NAME)
+            .doc(threadId)
+            .update({'message_count': 0});
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  static void deleteMessages(String threadId) async {
+    final _baseController = BaseController(Get.context, (){});
+    try {
+      _baseController.showProgress();
+      FirebaseFirestore.instance
+          .collection(ThreadModel.TABLE_NAME)
+          .doc(threadId)
+          .update({
+        'last_message': null,
+        'last_message_time': null,
+        'messageCount': 0,
+        'sender_id': null
+      });
+      FirebaseFirestore.instance
+          .collection(ThreadModel.TABLE_NAME)
+          .doc(threadId)
+          .collection(ChatModel.TABLE_NAME)
+          .get()
+          .then((snapshot) {
+        for (DocumentSnapshot ds in snapshot.docs) {
+          ds.reference.delete();
+        }
+      });
+      _baseController.hideProgress();
+    } catch (e) {
+      _baseController.hideProgress();
+      print('Error: $e');
+    }
+  }
+
 
   @override
   String toString() {

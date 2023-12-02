@@ -1,20 +1,30 @@
 import 'dart:io';
-
 import 'package:adaptive_dialog/adaptive_dialog.dart';
+import 'package:bematched/models/story_model.dart';
+import 'package:bematched/screens/auth/flow4_mode_screen/mode_screen.dart';
+import 'package:bematched/utils/base_controller.dart';
+import 'package:bematched/utils/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import '../models/chat_model.dart';
-import '../models/group_model.dart';
 import '../models/home_user_filter_model.dart';
 import '../models/notification_model.dart';
+import '../models/option_model.dart';
 import '../models/report_message_model.dart';
 import '../models/thread_model.dart';
 import '../models/user_model.dart';
 import '../screens/admin_base_controller.dart';
+import '../screens/auth/flow1_name_screen/name_screen.dart';
+import '../screens/auth/flow2_gender_screen/gender_screen.dart';
+import '../screens/auth/flow3_birth_screen/birth_screen.dart';
+import '../screens/auth/flow5_picture_screen/picture_screen.dart';
+import '../screens/auth/flow6_interest_screen/interest_screen.dart';
+import '../screens/auth/flow7_describe_screen/describe_screen.dart';
+import '../screens/auth/flow8_lcoation_screen/location_screen.dart';
+import '../screens/navbar_screen/navbar_screen.dart';
 import '../utils/extension.dart';
 
 //******************************************************************************
@@ -47,8 +57,7 @@ class NetWorkServices {
       var authUser = await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: userModel.email!, password: userModel.password!);
       userModel.uid = authUser.user?.uid ?? "";
-      return await UserModel.getUserDetail(
-          FirebaseAuth.instance.currentUser!.uid);
+      return await UserModel.getUserDetail(userModel.uid ?? '');
     } on FirebaseAuthException catch (e) {
       print(e.message);
       throw AppException(e.message);
@@ -100,7 +109,7 @@ class NetWorkServices {
   }
 
   static Future deleteFile(String url) async {
-    if ((url.isEmpty ?? true) || !url.contains("firebasestorage")) {
+    if ((url.isEmpty) || !url.contains("firebasestorage")) {
       return;
     }
 
@@ -129,103 +138,69 @@ class NetWorkServices {
     int pageSize = 30;
     var currentUser = AdminBaseController.userData.value;
 
-    var startDate = DateTime.now()
+/*    var startDate = DateTime.now()
         .subtract(Duration(days: 365 * (userFilter.age?.start ?? 0)));
     var endDate = DateTime.now()
         .subtract(Duration(days: 365 * (userFilter.age?.end ?? 0)));
-    Query<Map<String, dynamic>> snapShotQuery;
+    Query<Map<String, dynamic>> snapShotQuery;*/
 
-    snapShotQuery = FirebaseFirestore.instance
-        .collection(UserModel.TABLE_NAME)
-        .where("is_deleted", isEqualTo: false)
-        .where("i_am", whereIn: userFilter.lookingFor ?? [])
-        .where("is_private", isEqualTo: false);
+    var snapShot =
+        await FirebaseFirestore.instance.collection(UserModel.TABLE_NAME);
+    /*       .where('isBlocked', isEqualTo: false)
+        .where('isDeleted', isEqualTo: false);*/
 
-    /*    .where("dob", isGreaterThanOrEqualTo: Timestamp.fromDate(endDate))
-          .where("dob", isLessThanOrEqualTo: Timestamp.fromDate(startDate))
-          .orderBy("dob");
-
-      */
-    if (startDate.year > 1970 && endDate.year > 1970) {
-      print(
-          "if 1 ${endDate.year} ${startDate.year}");
-
-      snapShotQuery = snapShotQuery
-          .where("dob", isGreaterThanOrEqualTo: Timestamp.fromDate(endDate))
-          .where("dob", isLessThanOrEqualTo: Timestamp.fromDate(startDate))
-          .orderBy("dob");
-    } else if (endDate.year < 1970 && startDate.year < 1970) {
-      print(
-          "if 2 ${endDate.year} ${startDate.year}");
-
-      snapShotQuery = snapShotQuery
-          .where("dob", isLessThanOrEqualTo: DateTime(1970))
-          // .where("dob", isGreaterThanOrEqualTo: Timestamp.fromDate(endDate))
-          .orderBy("dob");
-    } else {
-      print(
-          "if 3 ${endDate.year} ${startDate.year}");
-
-      snapShotQuery = snapShotQuery
-          .where("dob", isLessThanOrEqualTo: Timestamp.fromDate(startDate))
-          .orderBy("dob");
-    }
-
-    if (AdminBaseController.getDocument != null) {
-      print(AdminBaseController.getDocument!.id);
-      snapShotQuery =
-          snapShotQuery.startAfterDocument(AdminBaseController.getDocument!);
-    }
-    var snapShot = await snapShotQuery.limit(pageSize).get();
+    var qerysnapShot = await snapShot.limit(pageSize).get();
     var myId = AdminBaseController.userData.value.uid;
-    var points = AdminBaseController.getPosition;
-    /* GeoFirePoint center =
-        geo.point(latitude: points.latitude, longitude: points.longitude);
+    var connectionStatus = AdminBaseController.userData.value.connectionStatus;
     print("started");
-    Stream<List<DocumentSnapshot>> stream = geo
-        .collection(collectionRef: snapShotQuery.limit(10))
-        .within(
-            center: center,
-            radius: userFilter.distance!.toDouble(),
-            field: field);
-    print("endded");
 
-    stream.listen((List<DocumentSnapshot> documentList) {
-      print(documentList.map((e) => e.data()));
-    });*/
-    //print("object_length=> " + snapShot.docs.length.toString());
-
-    var filterItem = snapShot.docs
+    var filterItem = qerysnapShot.docs
         .map((e) {
-          AdminBaseController.updateDocument(e);
           return UserModel.fromJson(e.data());
         })
+
+        //for Age Filter
         .where((element) =>
             element.age > userFilter.age!.start! &&
             element.age <= userFilter.age!.end!)
+
+        // for filtering myProfile
         .where((element) => element.uid != myId)
-        .where((element) {
-          /*print(element.distance.toString() +
-              "<" +
-              userFilter.distance.toString());
-          */
-          return element.distance < userFilter.distance!;
-        })
+
+        // for filtering already liked and dislike users
         .where((element) =>
             !currentUser.isLiked(element.uid!) &&
-            !currentUser.isDisLiked(element.uid!))
-        .where((element) =>
-            userFilter.interestedIn?.contains(element.myGender) ?? false)
-        .toList();
+            !currentUser.isDisLiked(element.uid!) &&
+            !currentUser.isMatched(element.uid!))
 
-    if (filterItem.isEmpty && snapShot.docs.length == pageSize) {
+        // for filtering Connection Status
+        .where((element) => element.connectionStatus == connectionStatus)
+        .toList();
+    if (currentUser.connectionStatus == 1) {
+      filterItem = filterItem
+          .where((element) => element.myGender == currentUser.myGender)
+          .toList();
+    } else {
+      // for filtering gender
+      filterItem = filterItem
+          .where((element) =>
+              userFilter.interestedIn == (element.myGender ?? false))
+          .toList();
+    }
+    print('UseLocation>>>${userFilter.useLocation}');
+    if (userFilter.useLocation ?? true) {
+      // for filtering Distance
+      filterItem = filterItem
+          .where((element) => element.distance < userFilter.distance!)
+          .toList();
+    }
+
+    if (filterItem.isEmpty && qerysnapShot.docs.length == pageSize) {
       return await getHomeUsers(userFilter);
     }
 
     return filterItem;
-    return [];
   }
-
 
   //******************************************************************************
   static Future<void> sendPasswordResetEmail(String email) async {
@@ -237,31 +212,126 @@ class NetWorkServices {
     }
   }
 
-/*  static Future<void> likeUser(UserModel liker, UserModel likee) async {
-    var isMatch = *//*likee.isSuperLiked(liker.uid!) ||*//* likee
-        .isLiked(liker.uid!);
+  static Future<void> likeUser(
+      UserModel liker, UserModel likee, BuildContext context) async {
+    final _baseController = BaseController(context, () {});
+    var isMatch = likee.isLiked(liker.uid!);
+    print('start like process');
 
+    if (isMatch) {
+      print('liked Profile');
+      _baseController.showProgress();
+      await FirebaseFirestore.instance
+          .collection(UserModel.TABLE_NAME)
+          .doc(liker.uid)
+          .update({
+        "myLikes": FieldValue.arrayRemove([likee.uid]),
+        "otherLikes": FieldValue.arrayRemove([likee.uid]),
+        "matches": FieldValue.arrayUnion([likee.uid]),
+      });
+      await FirebaseFirestore.instance
+          .collection(UserModel.TABLE_NAME)
+          .doc(likee.uid)
+          .update({
+        "myLikes": FieldValue.arrayRemove([liker.uid]),
+        "otherLikes": FieldValue.arrayRemove([liker.uid]),
+        "matches": FieldValue.arrayUnion([liker.uid]),
+      });
+      await createNewThread(liker, likee, null);
+      print('end like process');
+      _baseController.hideProgress();
+      return;
+    }
     await FirebaseFirestore.instance
         .collection(UserModel.TABLE_NAME)
         .doc(liker.uid)
         .update({
-      "my_likes": FieldValue.arrayUnion([likee.uid]),
-      "likes": FieldValue.increment(
-          liker.memberShipType == UserModel.MEMBER_PREMIUM_NON ? -1 : 0),
-      if (isMatch) "matches": FieldValue.arrayUnion([likee.uid]),
+      "myLikes": FieldValue.arrayUnion([likee.uid]),
     });
     await FirebaseFirestore.instance
         .collection(UserModel.TABLE_NAME)
         .doc(likee.uid)
         .update({
-      "other_likes": FieldValue.arrayUnion([liker.uid]),
-      if (isMatch) "matches": FieldValue.arrayUnion([liker.uid]),
+      "otherLikes": FieldValue.arrayUnion([liker.uid]),
     });
-    if (isMatch) {
-      await createNewThread(liker, likee, null);
-      await sendMatchNotification(liker, likee);
+    var userModel = await NetWorkServices.getUserDetail();
+    if (userModel != null) {
+      AdminBaseController.updateUser(userModel);
     }
-  }*/
+  }
+
+  static Future<List<StoryModel>> getStoryById(String uid) async {
+    List<StoryModel> list = [];
+    print('Start STory Function>>>>>>>>');
+    try {
+      var document = await FirebaseFirestore.instance
+          .collection(StoryModel.TABLE_NAME)
+          .where('sender_id', isEqualTo: uid)
+          .get();
+      if (document.docs.isNotEmpty) {
+        list = document.docs
+            .map((e) {
+              var storyModel = StoryModel.fromJson(e.data());
+              print('StoryModel>>>$storyModel');
+              return storyModel;
+            })
+            .where(
+                (element) => (element.storyTime!.toDate().isNotCompletedCycle))
+            .toList();
+        var userModel = await UserModel.getUserDetail(uid);
+        if (userModel != null) {
+          list = list.map((e) {
+            e.userDetail = userModel;
+            return e;
+          }).toList();
+        }
+      }
+    } catch (e) {
+      print('Error Catch');
+      print(e);
+    }
+
+    return list;
+  }
+
+  static Future<void> followUser(UserModel liker, UserModel likee) async {
+    await FirebaseFirestore.instance
+        .collection(UserModel.TABLE_NAME)
+        .doc(likee.uid)
+        .update({
+      "followers": FieldValue.arrayUnion([liker.uid]),
+    });
+    await FirebaseFirestore.instance
+        .collection(UserModel.TABLE_NAME)
+        .doc(liker.uid)
+        .update({
+      "following": FieldValue.arrayUnion([likee.uid]),
+    });
+    var userModel =
+        await UserModel.getUserDetail(AdminBaseController.userData.value.uid!);
+    if (userModel != null) {
+      AdminBaseController.updateUser(userModel);
+    }
+  }
+
+  static Future<void> disLikeUser(UserModel liker, UserModel likee) async {
+    await FirebaseFirestore.instance
+        .collection(UserModel.TABLE_NAME)
+        .doc(liker.uid)
+        .update({
+      "myLikes": FieldValue.arrayRemove([likee.uid]),
+      "matches": FieldValue.arrayRemove([likee.uid]),
+      "otherLikes": FieldValue.arrayRemove([likee.uid]),
+    });
+    await FirebaseFirestore.instance
+        .collection(UserModel.TABLE_NAME)
+        .doc(likee.uid)
+        .update({
+      "otherLikes": FieldValue.arrayRemove([liker.uid]),
+      "matches": FieldValue.arrayRemove([liker.uid]),
+      "myLikes": FieldValue.arrayRemove([liker.uid]),
+    });
+  }
 
   static Future<void> createNewThread(
       UserModel liker, UserModel likee, String? message) async {
@@ -279,7 +349,6 @@ class NetWorkServices {
       ..lastMessage = message
       ..lastMessageTime = Timestamp.now()
       ..senderId = liker.uid ?? ""
-      ..showImagesUserList = [liker.uid ?? "", likee.uid ?? ""]
       ..participantUserList = [liker.uid ?? "", likee.uid ?? ""]
       ..messageCount = 1;
     await FirebaseFirestore.instance
@@ -303,30 +372,6 @@ class NetWorkServices {
         .set(chatModel.toJson(), SetOptions(merge: true));
   }
 
-  static Future<void> disLikeUser(UserModel liker, UserModel likee) async {
-    await FirebaseFirestore.instance
-        .collection(UserModel.TABLE_NAME)
-        .doc(liker.uid)
-        .update({
-      "my_likes": FieldValue.arrayRemove([likee.uid]),
-      "my_super_likes": FieldValue.arrayRemove([likee.uid]),
-      "matches": FieldValue.arrayRemove([likee.uid]),
-      "other_likes": FieldValue.arrayRemove([likee.uid]),
-      "other_super_likes": FieldValue.arrayRemove([likee.uid])
-    });
-    await FirebaseFirestore.instance
-        .collection(UserModel.TABLE_NAME)
-        .doc(likee.uid)
-        .update({
-      "other_likes": FieldValue.arrayRemove([liker.uid]),
-      "other_super_likes": FieldValue.arrayRemove([liker.uid]),
-      "matches": FieldValue.arrayRemove([liker.uid]),
-      "my_likes": FieldValue.arrayRemove([liker.uid]),
-      "my_super_likes": FieldValue.arrayRemove([liker.uid])
-    });
-  }
-
-
   static Future<void> sendMatchNotification(
       UserModel liker, UserModel likee) async {
     var notification = NotificationModel()
@@ -347,17 +392,7 @@ class NetWorkServices {
         message: "You got a match with ${likee.name}");
   }
 
-
   static Future<List<UserModel>> getOtherLikes(UserModel userData) async {
-    var snapShot = await FirebaseFirestore.instance
-        .collection(UserModel.TABLE_NAME)
-        .where("my_likes", arrayContains: userData.uid)
-        .get();
-    print(snapShot.docs);
-    return snapShot.docs.map((e) => UserModel.fromJson(e.data())).toList();
-  }
-
-  static Future<List<UserModel>> getOtherSuperLikes(UserModel userData) async {
     var snapShot = await FirebaseFirestore.instance
         .collection(UserModel.TABLE_NAME)
         .where("my_likes", arrayContains: userData.uid)
@@ -374,230 +409,72 @@ class NetWorkServices {
     return snapShot.docs.map((e) => UserModel.fromJson(e.data())).toList();
   }
 
-  static Future<void> joinGroup(String uid, String groupId) async {
-    await FirebaseFirestore.instance
-        .collection(GroupModel.TABLE_NAME)
-        .doc(groupId)
-        .set({
-      "participant_user_list": FieldValue.arrayUnion([uid]),
-      "show_images_user_list": FieldValue.arrayUnion([uid])
-    }, SetOptions(merge: true));
+  static Future<void> setUserStatus(int status) async {
+    var uid = AdminBaseController.userData.value.uid;
+    FirebaseFirestore.instance
+        .collection(UserModel.TABLE_NAME)
+        .doc(uid)
+        .update({
+      'chatStatus': status,
+      'lastActive': Timestamp.now(),
+    });
   }
 
-  static Future<void> createGroup(
-      GroupModel groupModel, NotificationModel notificationModel) async {
-    await FirebaseFirestore.instance
-        .collection(GroupModel.TABLE_NAME)
-        .doc(groupModel.id)
-        .set(groupModel.toJson(), SetOptions(merge: true));
-    await FirebaseFirestore.instance
-        .collection(NotificationModel.TABLE_NAME)
-        .doc(notificationModel.id)
-        .set(notificationModel.toJson(), SetOptions(merge: true));
-  }
-
-/*  static Future<void> toogleBookMar(
-      bool isContains, GroupModel? groupModel) async {
-    var uid = AdminBaseController.userData.value.uid;
-    Get.snackbar(AppLanguages.FAVORITES_GROUPS,
-        "You marked this group as ${!isContains ? "favourite" : "Un favourite"}",
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: AppColors.PINK_Dark);
-    await FirebaseFirestore.instance
-        .collection(GroupModel.TABLE_NAME)
-        .doc(groupModel!.id!)
-        .set({
-      "bookmark_list": !isContains
-          ? FieldValue.arrayUnion([uid])
-          : FieldValue.arrayRemove([uid])
-    }, SetOptions(merge: true));
-  }*/
-
-  static Future<List<GroupModel>> getAllGroups() async {
-    var uid = AdminBaseController.userData.value.uid;
-    var snapShot = await FirebaseFirestore.instance
-        .collection(GroupModel.TABLE_NAME)
-        .where("is_global", isEqualTo: false)
-        .where("created_by", isNotEqualTo: uid)
-        .where("is_private", isEqualTo: false)
-        .get();
-    return snapShot.docs.map((e) => GroupModel.fromJson(e.data())).toList();
-  }
-
-/*  static Future<int> showGroupOptions(GroupModel groupModel) async {
-    var uid = AdminBaseController.userData.value.uid;
-    var result = await showConfirmationDialog(
-        title: AppLanguages.GROUP_SETTINGS,
-        message: AppLanguages.PLEASE_SELECT_VALUE,
-        actions: [
-          AlertDialogAction(
-              key: "1",
-              label: groupModel.mutedList!.contains(uid)
-                  ? AppLanguages.UN_MUTE_GROUP
-                  : AppLanguages.MUTE_GROUP),
-          AlertDialogAction(
-              key: "2",
-              label: groupModel.createdBy == uid
-                  ? AppLanguages.DELETE_GROUP
-                  : AppLanguages.EXIT_GROUP),
-          AlertDialogAction(
-              key: "3",
-              label: !groupModel.showImagesUserList!.contains(uid)
-                  ? AppLanguages.UN_MUTE_IMAGE
-                  : AppLanguages.MUTE_IMAGE),
-        ],
-        context: Get.context!);
-    if (result == null) return -1;
-    if (result == "1") {
-      await muteUnMuteGroup(
-          groupModel.id!, groupModel.mutedList!.contains(uid), uid!);
-      return 0;
-    } else if (result == "2") {
-      if (groupModel.createdBy == uid) {
-        var result = await showOkCancelAlertDialog(
-            context: Get.context!,
-            title: AppLanguages.DELETE_GROUP,
-            message: AppLanguages.DO_YOU_REALLY_WANT_DELETE);
-        if (result == OkCancelResult.ok) {
-          await deleteGroup(groupModel.id!);
-          return 1;
-        }
-        return -1;
-      }
-
-      var result = await showOkCancelAlertDialog(
-          context: Get.context!,
-          title: AppLanguages.EXIT_GROUP,
-          message: AppLanguages.DO_YOU_REALLY_WANT_TO_LEAVE);
-      if (result == OkCancelResult.ok) {
-        await leaveGroup(groupModel.id!, uid!);
-        return 1;
-      }
-      return -1;
-    } else {
-      await muteUnMuteImagesGroup(
-          groupModel.id!, groupModel.showImagesUserList!.contains(uid), uid!);
-      print("going");
-      return 2;
+  static Future<List<String>> loadOption(String tableName) async {
+    List<OptionModel> optionList = [];
+    var documents =
+        await FirebaseFirestore.instance.collection(tableName).get();
+    if (documents.docs.isNotEmpty) {
+      optionList =
+          documents.docs.map((e) => OptionModel.fromJson(e.data())).toList();
     }
-    return -1;
+    return optionList.map((e) => e.value ?? '').toList();
+  }
+
+  static Future<void> updateIsDate(bool status) async {
+    var userModel = AdminBaseController.userData.value;
+    userModel.isDate = status;
+    userModel.addNewUserOrUpdate();
+    AdminBaseController.updateUser(userModel);
+  }
+
+  static Future<void> updateMemberShip(int memberType, String uid) async {
+    var user = AdminBaseController.userData.value;
+    if (memberType != UserModel.MEMBER_PREMIUM_NON &&
+        user.updatedTime != null &&
+        user.memberShipType == memberType) {
+      return;
+    }
+    await FirebaseFirestore.instance
+        .collection(UserModel.TABLE_NAME)
+        .doc(uid)
+        .set({
+      "member_ship_type": memberType,
+      // "total_stars": UserModel.STARS[memberType],
+      "updatedTime":
+          memberType == UserModel.MEMBER_PREMIUM_NON ? null : Timestamp.now()
+    }, SetOptions(merge: true));
+  }
+
+  //*******************************************************************
+  static Future<void> blockUserAndUnBlock(
+      UserModel receiverDetail, ThreadModel threadModel) async {
+    //*******************************************************************
+    if (threadModel.isBlocked ?? false) {
+      await UnblockUser(receiverDetail, threadModel);
+      Get.back();
+      return;
+    }
+    var result = await showOkCancelAlertDialog(
+        context: Get.context!,
+        title: 'Block User',
+        message: 'Do you really want to block?',
+        okLabel: 'Yes',
+        cancelLabel: 'No');
     print(result);
-  }*/
-
-  static Future<void> muteUnMuteGroup(
-      String groupId, bool isMute, String uid) async {
-    await FirebaseFirestore.instance
-        .collection(GroupModel.TABLE_NAME)
-        .doc(groupId)
-        .set({
-      "muted_list":
-          isMute ? FieldValue.arrayRemove([uid]) : FieldValue.arrayUnion([uid])
-    }, SetOptions(merge: true));
-  }
-
-  static Future<void> muteUnMuteImagesGroup(
-      String groupId, bool isMute, String uid) async {
-    await FirebaseFirestore.instance
-        .collection(GroupModel.TABLE_NAME)
-        .doc(groupId)
-        .set({
-      "show_images_user_list":
-          isMute ? FieldValue.arrayRemove([uid]) : FieldValue.arrayUnion([uid])
-    }, SetOptions(merge: true));
-  }
-
-  static Future<void> muteUnMuteImagesThread(
-      String threadId, bool isMute, String uid) async {
-    await FirebaseFirestore.instance
-        .collection(ThreadModel.TABLE_NAME)
-        .doc(threadId)
-        .set({
-      "show_images_user_list":
-          isMute ? FieldValue.arrayRemove([uid]) : FieldValue.arrayUnion([uid])
-    }, SetOptions(merge: true));
-  }
-
-  static Future<void> muteUnMuteChat(
-      String threadId, bool isMute, String uid) async {
-    await FirebaseFirestore.instance
-        .collection(ThreadModel.TABLE_NAME)
-        .doc(threadId)
-        .set({
-      "muted_list":
-          isMute ? FieldValue.arrayRemove([uid]) : FieldValue.arrayUnion([uid])
-    }, SetOptions(merge: true));
-  }
-
-  static Future<void> deleteGroup(String groupId) async {
-    await FirebaseFirestore.instance
-        .collection(GroupModel.TABLE_NAME)
-        .doc(groupId)
-        .delete();
-  }
-
-  static Future<void> leaveGroup(String groupId, String uid) async {
-    await FirebaseFirestore.instance
-        .collection(GroupModel.TABLE_NAME)
-        .doc(groupId)
-        .set({
-      "participant_user_list": FieldValue.arrayRemove([uid])
-    }, SetOptions(merge: true));
-  }
-
-  static Future<void> enterLeaveGroup(
-      bool isEnter, GroupModel groupModel) async {
-    var uid = AdminBaseController.userData.value.uid;
-    await FirebaseFirestore.instance
-        .collection(GroupModel.TABLE_NAME)
-        .doc(groupModel.id)
-        .set({
-      "active_user_list": isEnter
-          ? FieldValue.arrayUnion([uid])
-          : FieldValue.arrayRemove([uid]),
-      "non_active_user_list": FieldValue.arrayRemove([uid])
-    }, SetOptions(merge: true));
-  }
-
-  static Future<void> sendMesageInGroup(
-      GroupModel groupModel, bool isImage) async {
-    print(groupModel.activeUserList!);
-    await FirebaseFirestore.instance
-        .collection(GroupModel.TABLE_NAME)
-        .doc(groupModel.id)
-        .set({
-      "non_active_user_list": FieldValue.arrayUnion([
-        ...groupModel.participantUserList!
-            .where((element) =>
-                !groupModel.activeUserList!.contains(element.toString()))
-            .where((element) =>
-                !isImage ||
-                groupModel.activeUserList!.contains(element.toString()))
-            .toList()
-      ])
-    }, SetOptions(merge: true));
-  }
-
-  static updatePrivacy(GroupModel groupModel, bool isPrivate) async {
-    await FirebaseFirestore.instance
-        .collection(GroupModel.TABLE_NAME)
-        .doc(groupModel.id)
-        .set({"is_private": isPrivate}, SetOptions(merge: true));
-  }
-
-  static Future<GroupModel> loadGroupDetail(String? id) async {
-    var snapShot = await FirebaseFirestore.instance
-        .collection(GroupModel.TABLE_NAME)
-        .doc(id)
-        .get();
-    return GroupModel.fromJson(snapShot.data() ?? {});
-  }
-
-  static Future<void> acceptChat(String? threadId) async {
-    await FirebaseFirestore.instance
-        .collection(ThreadModel.TABLE_NAME)
-        .doc(threadId!)
-        .set({"is_pending": false}, SetOptions(merge: true));
+    if (result == OkCancelResult.cancel) return;
+    await NetWorkServices.blockUser(receiverDetail, threadModel);
+    Get.back();
   }
 
   static Future<void> blockUser(
@@ -685,33 +562,6 @@ class NetWorkServices {
       "last_message_time": Timestamp.now(),
       "message_count": 1,
     }, SetOptions(merge: true));*/
-  }
-
-
-  static Future<void> purchaseStar(int count, String uid) async {
-    await FirebaseFirestore.instance
-        .collection(UserModel.TABLE_NAME)
-        .doc(uid)
-        .set({"total_stars": FieldValue.increment(count)},
-            SetOptions(merge: true));
-  }
-
-  static Future<void> updateAccountPrivacy(String uid, bool status) async {
-    await FirebaseFirestore.instance
-        .collection(UserModel.TABLE_NAME)
-        .doc(uid)
-        .update({
-      "is_private": status,
-    });
-  }
-
-
-  static Future<GroupModel> getGroupDetail(String groupId) async {
-    var snapShot = await FirebaseFirestore.instance
-        .collection(GroupModel.TABLE_NAME)
-        .doc(groupId)
-        .get();
-    return GroupModel.fromJson(snapShot.data() ?? {});
   }
 
 /*  static Future<String?> changePassword() async {
@@ -900,10 +750,64 @@ class AppException implements Exception {
   AppException(this.error);
 }
 
+//****************************************************************
+void navigateToScreen(int flow) async {
+  //****************************************************************
+
+  switch (NavigationType.values[flow]) {
+    case NavigationType.NAME_FLOW:
+      Get.offAll(NameScreen());
+      break;
+    case NavigationType.GENDER_FLOW:
+      Get.offAll(GenderScreen());
+      break;
+    case NavigationType.BIRTH_FLOW:
+      Get.offAll(BirthScreen());
+      break;
+    case NavigationType.MODE_FLOW:
+      Get.offAll(ModeScreen());
+      break;
+    case NavigationType.PICTURE_FLOW:
+      Get.offAll(PictureScreen());
+      break;
+    case NavigationType.INTEREST_FLOW:
+      Get.offAll(InterestScreen());
+      break;
+    case NavigationType.DESCRIBE_FLOW:
+      Get.offAll(DescribeScreen());
+      break;
+    case NavigationType.LOCATION_FLOW:
+      Get.offAll(LocationScreen());
+      break;
+    case NavigationType.SWIPE:
+      Get.offAll(NavBarScreen());
+      break;
+    default:
+      {
+        if (AdminBaseController.userData.value.isBlocked ?? false) {
+          showOkAlertDialog(
+              context: Get.context!,
+              title: 'Error',
+              message: 'Your Account is Blocked by Admin');
+
+          return;
+        }
+        /*  if ((!await Permission.location.isGranted) ||
+              (!await Permission.locationWhenInUse.serviceStatus.isEnabled)) {
+            Get.offAll(LocationPermissionScreen());
+            return;
+          }*/
+
+        Get.offAll(NavBarScreen());
+      }
+  }
+}
+
 enum NavigationType {
   NAME_FLOW,
   GENDER_FLOW,
   BIRTH_FLOW,
+  MODE_FLOW,
   PICTURE_FLOW,
   INTEREST_FLOW,
   DESCRIBE_FLOW,

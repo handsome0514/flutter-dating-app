@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import '../../widgets/notification_card.dart';
 
 class NotificationScreen extends StatelessWidget {
-  NotificationScreen({super.key});
+  const NotificationScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +34,6 @@ class NotificationScreen extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 22),
           child: Column(
             children: [
-
               const SizedBox(height: 26),
               ...List.generate(10, (index) => const NotificationCard()),
             ],

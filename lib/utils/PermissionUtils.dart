@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:geolocator/geolocator.dart';
@@ -14,16 +16,16 @@ class PermissionUtils {
     bool isPrecise = false;
     switch (accuracyStatus) {
       case LocationAccuracyStatus.reduced:
-        print("approximate");
+        log("approximate");
         break;
       case LocationAccuracyStatus.precise:
         // Precise location switch is ON.
-        print("precise");
+        log("precise");
         isPrecise = true;
 
         break;
       case LocationAccuracyStatus.unknown:
-        print("unknonwn");
+        log("unknonwn");
         // The platform doesn't support this feature, for example an Android device.
         break;
     }
@@ -40,9 +42,9 @@ class PermissionUtils {
     var status = await permission.request();
     var endTime = DateTime.now();
     var waitTime = startTime.difference(endTime).inSeconds.abs();
-    print(waitTime);
+    log(waitTime.toString());
 
-    print(status);
+    log(status.toString());
     /*  if (Platform.isIOS && status == permission.isLimited) {
       return true;
     }*/
@@ -67,7 +69,7 @@ class PermissionUtils {
       return false;
     }
 
-    print(permission.status);
+    log(permission.status.toString());
     return status.isGranted;
   }
 }

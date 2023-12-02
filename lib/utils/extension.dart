@@ -1,7 +1,4 @@
-
-
-
-
+// ignore_for_file: non_constant_identifier_names
 
 import 'dart:math';
 
@@ -14,6 +11,14 @@ extension MyDate on DateTime {
   String get dd_mm_yyyy {
     return DateFormat('dd-MM-yyyy').format(this);
   }
+
+  String get lastActive {
+    return 'last seen at ${DateFormat('dd-MM-yyyy hh:mm a').format(this)}';
+  }
+
+  String get hh_mm_a {
+    return DateFormat('hh:mm a').format(this);
+  }
 }
 
 String createThreadId(String s1, String s2) {
@@ -23,19 +28,19 @@ String createThreadId(String s1, String s2) {
 double calculateDistance(lat1, lon1, lat2, lon2) {
   return Geolocator.distanceBetween(lat1, lon1, lat2, lon2);
 
-  var p = 0.017453292519943295;
-  var c = cos;
-  var a = 0.5 -
-      c((lat2 - lat1) * p) / 2 +
-      c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
-  return 12742 * asin(sqrt(a));
+  // var p = 0.017453292519943295;
+  // var c = cos;
+  // var a = 0.5 -
+  //     c((lat2 - lat1) * p) / 2 +
+  //     c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
+  // return 12742 * asin(sqrt(a));
 }
 
 String kDateFormat(DateTime dateTime, String format) {
   final df = DateFormat(format);
   int myvalue = dateTime.microsecondsSinceEpoch;
   return df.format(dateTime);
-  print(df.format(DateTime.fromMillisecondsSinceEpoch(myvalue * 1000)));
+  // print(df.format(DateTime.fromMillisecondsSinceEpoch(myvalue * 1000)));
 }
 
 String generateRandomString(int len) {
@@ -45,17 +50,16 @@ String generateRandomString(int len) {
   return List.generate(len, (index) => _chars[r.nextInt(_chars.length)]).join();
 }
 
-
 class CardNumberFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
-      TextEditingValue previousValue,
-      TextEditingValue nextValue,
-      ) {
-    var inputText = nextValue.text;
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    var inputText = newValue.text;
 
-    if (nextValue.selection.baseOffset == 0) {
-      return nextValue;
+    if (newValue.selection.baseOffset == 0) {
+      return newValue;
     }
 
     var bufferString = StringBuffer();
@@ -68,7 +72,7 @@ class CardNumberFormatter extends TextInputFormatter {
     }
 
     var string = bufferString.toString();
-    return nextValue.copyWith(
+    return newValue.copyWith(
       text: string,
       selection: TextSelection.collapsed(
         offset: string.length,
@@ -103,7 +107,6 @@ class CardExpirationFormatter extends TextInputFormatter {
   }
 }
 
-
 extension DateExtension on DateTime {
   String formatDate(String format) {
     var now = this;
@@ -112,48 +115,61 @@ extension DateExtension on DateTime {
     return formattedDate;
   }
 
+  bool get isNotCompletedCycle {
+    var now = DateTime.now();
+    var duration = difference(now).inHours;
+
+    return duration != 24;
+  }
+
+  bool get withinTenDays {
+    var now = DateTime.now();
+    return now.difference(this).inHours < 240;
+  }
+
+  bool get isNotEighteenPlus {
+    var now = DateTime.now();
+    var age = now.difference(this).inDays ~/ 365;
+
+    return age < 18;
+  }
+
   bool isToday() {
     var now = DateTime.now();
-    return (this.day == now.day &&
-        this.month == now.month &&
-        this.year == now.year);
+    return (day == now.day && month == now.month && year == now.year);
   }
 
   bool isTomorrow() {
     var now = DateTime.now();
     print("************************************");
 
-    print(this.day);
+    print(day);
     print(now.day);
-    return (this.day == (now.day + 1) &&
-        this.month == now.month &&
-        this.year == now.year);
+    return (day == (now.day + 1) && month == now.month && year == now.year);
   }
 
   bool isSameDate(DateTime other) {
-    return this.year == other.year &&
-        this.month == other.month &&
-        this.day == other.day;
+    return year == other.year && month == other.month && day == other.day;
   }
 }
 
 extension EmailValidator on String {
   bool isValidEmail() {
     return RegExp(
-        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
+            r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
         .hasMatch(this);
   }
 
   String kcapitalizeFirstLetter() {
     if ((length) == 0) return this;
-    if ((length) == 1) return this.toUpperCase();
-    return this[0].toUpperCase() + this.substring(1);
+    if ((length) == 1) return toUpperCase();
+    return this[0].toUpperCase() + substring(1);
   }
 
   String kcapitalizeWord() {
     if ((length) == 0) return this;
-    if ((length) == 1) return this.toUpperCase();
-    var dataSplit = this.split(" ");
+    if ((length) == 1) return toUpperCase();
+    var dataSplit = split(" ");
     print(dataSplit);
     var data = "";
     int index = 0;
@@ -161,7 +177,7 @@ extension EmailValidator on String {
       if (index == 0) {
         data = word;
       } else {
-        data = data + " " + word.kcapitalizeFirstLetter();
+        data = "$data ${word.kcapitalizeFirstLetter()}";
       }
       index++;
     }
@@ -192,7 +208,7 @@ extension EmailValidator on String {
 extension NumberParsing on int {
   double wRes(BuildContext context) {
     double originalWidth = 1920;
-    double value = this.toDouble();
+    double value = toDouble();
     double calculatedValue =
         (value / originalWidth) * MediaQuery.of(context).size.width;
 /*    print(value.toString() +
@@ -205,7 +221,7 @@ extension NumberParsing on int {
 
   double hRes(BuildContext context) {
     double originalHeight = 1080;
-    double value = this.toDouble();
+    double value = toDouble();
     double calculatedValue =
         (value / originalHeight) * MediaQuery.of(context).size.height;
 /*    print(value.toString() +
@@ -228,7 +244,7 @@ extension DoubleParsing on double {
 
   double hRes(BuildContext context) {
     double originalHeight = 1080;
-    double value = this.toDouble();
+    double value = toDouble();
     double calculatedValue =
         (value / originalHeight) * MediaQuery.of(context).size.height;
 /*    print(value.toString() +
@@ -242,17 +258,12 @@ extension DoubleParsing on double {
 
 String kformatDate(DateTime dateTime) {
   String date = "";
-  date = dateTime.day <= 9
-      ? "0" + dateTime.day.toString()
-      : dateTime.day.toString();
+  date = dateTime.day <= 9 ? "0${dateTime.day}" : dateTime.day.toString();
   date += "-";
-  date += dateTime.month <= 9
-      ? "0" + dateTime.month.toString()
-      : dateTime.month.toString();
+  date +=
+      dateTime.month <= 9 ? "0${dateTime.month}" : dateTime.month.toString();
   date += "-";
-  date += dateTime.year <= 9
-      ? "0" + dateTime.year.toString()
-      : dateTime.year.toString();
+  date += dateTime.year <= 9 ? "0${dateTime.year}" : dateTime.year.toString();
   return date;
 }
 
@@ -270,9 +281,9 @@ extension ListExtension<T> on List<T> {
   List<T> mapList(T Function(dynamic element) elementCallBack) {
     List<T> outputList = [];
     List<Map<String, dynamic>> list = this as List<Map<String, dynamic>>;
-    list.forEach((listElement) {
+    for (var listElement in list) {
       outputList.add(elementCallBack.call(listElement));
-    });
+    }
     return outputList;
   }
 }
@@ -280,9 +291,10 @@ extension ListExtension<T> on List<T> {
 extension MapExtension<T, U> on Map<T, U> {
   int getIndex(T value) {
     int index = 0;
-    for (var item in this.keys.toList()) {
-      if (item.toString().toLowerCase().contains(value.toString()))
+    for (var item in keys.toList()) {
+      if (item.toString().toLowerCase().contains(value.toString())) {
         return index;
+      }
       index++;
     }
     return index;
@@ -290,7 +302,7 @@ extension MapExtension<T, U> on Map<T, U> {
 
   T? getkey(int selectedIndex) {
     int index = 0;
-    for (var item in this.keys.toList()) {
+    for (var item in keys.toList()) {
       if (index == selectedIndex) return item;
       index++;
     }
@@ -299,7 +311,7 @@ extension MapExtension<T, U> on Map<T, U> {
 
   U? getValue(int selectedIndex) {
     int index = 0;
-    for (var item in this.keys.toList()) {
+    for (var item in keys.toList()) {
       if (index == selectedIndex) return this[item];
       index++;
     }

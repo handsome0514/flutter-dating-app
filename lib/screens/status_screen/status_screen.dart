@@ -1,3 +1,4 @@
+import 'package:bematched/models/story_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -5,10 +6,15 @@ import '../../widgets/storyview/widgets/story_view.dart';
 import 'status_screen_controller.dart';
 
 class StatusScreen extends StatefulWidget {
-  const StatusScreen({Key? key, required this.index, required this.list})
-      : super(key: key);
+  const StatusScreen(
+      {super.key,
+      required this.index,
+      required this.list,
+      required this.storyModel});
+
   final int index;
   final List<StoryItem> list;
+  final StoryModel storyModel;
 
   @override
   State<StatusScreen> createState() => _StatusScreenState();
@@ -37,7 +43,7 @@ class _StatusScreenState extends State<StatusScreen> {
     //   StoryItem.pageVideo(url, controller: controller)
 
     return Scaffold(
-      body:  StoryView(
+      body: StoryView(
         storyItems: widget.list,
         onStoryShow: (story) {},
         controller: _controller.storycontroller,
@@ -45,6 +51,7 @@ class _StatusScreenState extends State<StatusScreen> {
           //   _controller.storyitemslist[index].
           //    Get.back();
         },
+        storyModel: widget.storyModel,
       ),
     );
   }

@@ -1,37 +1,19 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import '../models/user_model.dart';
-
-
 
 //*******************************************************************
 class AdminBaseController
     extends GetxController //*******************************************************************
 {
   var userModel = UserModel().obs;
-  Rx<Position>? position;
-  Map<String, UserModel> users = {};
-
-  Rx<DocumentSnapshot>? lastDocument;
-
-  Rx<DocumentSnapshot>? lastAdvanceFilterDocument;
-
-  static bool isContains(String uid) {
-    var userController = Get.put(AdminBaseController(), permanent: true);
-    return userController.users[uid] != null;
-  }
-
-  static void addUser(UserModel userModel) {
-    var userController = Get.put(AdminBaseController(), permanent: true);
-    print(userModel);
-    userController.users[userModel.uid!] = userModel;
-  }
-
-  static UserModel? getUser(String uid) {
-    var userController = Get.put(AdminBaseController(), permanent: true);
-    return userController.users[uid];
-  }
+  List<String> heightOptions = [];
+  List<String> educationLevelOptions = [];
+  List<String> drinkingOptions = [];
+  List<String> smokingOptions = [];
+  List<String> relationshipOptions = [];
+  List<String> zodiacSignOptions = [];
+  List<String> industryOptions = [];
+  List<String> yearsOfExperienceOptions = [];
 
   //*******************************************************************
 
@@ -40,50 +22,103 @@ class AdminBaseController
   //*******************************************************************
   static void updateUser(UserModel userModel) {
     //*******************************************************************
-    var userController = Get.put(AdminBaseController(), permanent: true);
+    var userController = Get.put(AdminBaseController());
     userController.userModel.value = userModel;
     userController.update();
   }
 
   //*******************************************************************
-  static void updatePosition(Position position) {
+  static void updateHeightOptions(List<String> options) {
     //*******************************************************************
-    var userController = Get.put(AdminBaseController(), permanent: true);
-    userController.position = position.obs;
+    var userController = Get.put(AdminBaseController());
+    userController.heightOptions = options;
     userController.update();
   }
 
   //*******************************************************************
-  static void updateDocument(DocumentSnapshot? position) {
+  static void updateEducationLevelOptions(List<String> options) {
     //*******************************************************************
-    var userController = Get.put(AdminBaseController(), permanent: true);
-    userController.lastDocument = position?.obs;
+    var userController = Get.put(AdminBaseController());
+    userController.educationLevelOptions = options;
     userController.update();
   }
 
   //*******************************************************************
-  static void updateAdvanceFilterDocument(DocumentSnapshot? position) {
+  static void updateDrinkingOptions(List<String> options) {
     //*******************************************************************
-    var userController = Get.put(AdminBaseController(), permanent: true);
-    userController.lastAdvanceFilterDocument = position?.obs;
+    var userController = Get.put(AdminBaseController());
+    userController.drinkingOptions = options;
     userController.update();
-  }
+  } //*******************************************************************
 
-  static DocumentSnapshot? get getAdvanceFilterDocument {
-    return Get.put(AdminBaseController(), permanent: true)
-        .lastAdvanceFilterDocument
-        ?.value;
-  }
+  static void updateSmokingOptions(List<String> options) {
+    //*******************************************************************
+    var userController = Get.put(AdminBaseController());
+    userController.smokingOptions = options;
+    userController.update();
+  } //*******************************************************************
 
-  static DocumentSnapshot? get getDocument {
-    return Get.put(AdminBaseController(), permanent: true).lastDocument?.value;
-  }
+  static void updateRelationShipOptions(List<String> options) {
+    //*******************************************************************
+    var userController = Get.put(AdminBaseController());
+    userController.relationshipOptions = options;
+    userController.update();
+  } //*******************************************************************
 
-  static Position get getPosition {
-    return Get.put(AdminBaseController(), permanent: true).position!.value;
+  static void updateZodiacSignOptions(List<String> options) {
+    //*******************************************************************
+    var userController = Get.put(AdminBaseController());
+    userController.heightOptions = options;
+    userController.update();
+  } //*******************************************************************
+
+  static void updateIndustryOptions(List<String> options) {
+    //*******************************************************************
+    var userController = Get.put(AdminBaseController());
+    userController.heightOptions = options;
+    userController.update();
+  } //*******************************************************************
+
+  static void updateYearsOfExperienceOptions(List<String> options) {
+    //*******************************************************************
+    var userController = Get.put(AdminBaseController());
+    userController.heightOptions = options;
+    userController.update();
   }
 
   static Rx<UserModel> get userData {
-    return Get.put(AdminBaseController(), permanent: true).userModel;
+    return Get.put(AdminBaseController()).userModel;
+  }
+
+  static List<String> get heightOptionsData {
+    return Get.put(AdminBaseController()).heightOptions;
+  }
+
+  static List<String> get educationLevelOptionsData {
+    return Get.put(AdminBaseController()).heightOptions;
+  }
+
+  static List<String> get drinkingOptionsData {
+    return Get.put(AdminBaseController()).heightOptions;
+  }
+
+  static List<String> get smokingOptionsData {
+    return Get.put(AdminBaseController()).heightOptions;
+  }
+
+  static List<String> get relationshipOptionsData {
+    return Get.put(AdminBaseController()).heightOptions;
+  }
+
+  static List<String> get zodiacSignOptionsData {
+    return Get.put(AdminBaseController()).heightOptions;
+  }
+
+  static List<String> get industryOptionsData {
+    return Get.put(AdminBaseController()).heightOptions;
+  }
+
+  static List<String> get yearsOfExperienceOptionsData {
+    return Get.put(AdminBaseController()).heightOptions;
   }
 }

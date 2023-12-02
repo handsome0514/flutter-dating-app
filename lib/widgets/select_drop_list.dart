@@ -111,8 +111,8 @@ class SelectDropListState extends State<SelectDropList>
                 ], begin: Alignment.bottomCenter, end: Alignment.topCenter),
                 borderRadius: BorderRadius.circular(60)),
             child: Container(
-              margin:  EdgeInsets.all(1),
-              padding: const EdgeInsets.only(top: 16, bottom: 17),
+             margin: const EdgeInsets.all(1),
+              padding: const EdgeInsets.only(top: 10, bottom: 10),
               decoration: BoxDecoration(
                 border: Border.all(color: AppColors.LOCATION_COLOR, width: 2),
                 borderRadius: BorderRadius.circular(30),
@@ -153,7 +153,7 @@ class SelectDropListState extends State<SelectDropList>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.only(top: 16, bottom: 8),
+              padding: const EdgeInsets.only(top: 10, bottom: 5),
               child: Text(item,
                   style: const TextStyle(
                     fontSize: 18,

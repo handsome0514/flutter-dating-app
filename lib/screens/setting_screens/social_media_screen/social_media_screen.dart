@@ -3,10 +3,8 @@ import 'package:get/get.dart';
 
 import '../../../utils/constants.dart';
 
-
-
 class SocialMediaScreen extends StatelessWidget {
-  const SocialMediaScreen({Key? key}) : super(key: key);
+  const SocialMediaScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +34,7 @@ class SocialMediaScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Padding(
           padding:
-          const EdgeInsets.only(left: 16, right: 16, top: 15, bottom: 62),
+              const EdgeInsets.only(left: 16, right: 16, top: 15, bottom: 62),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,

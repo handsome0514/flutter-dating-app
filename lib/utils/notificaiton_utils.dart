@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -7,7 +9,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get_rx/src/rx_workers/utils/debouncer.dart';
 
 class NotificationUtils {
-  static FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+  static final FirebaseMessaging _firebaseMessaging =
+      FirebaseMessaging.instance;
   static FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
   static late BuildContext _context;
@@ -24,7 +27,7 @@ class NotificationUtils {
   static Future<dynamic> myBackgroundMessageHandler(
       Map<String, dynamic> message) async {
     await Firebase.initializeApp();
-    print("onBackgroundMessage: $message");
+    log("onBackgroundMessage: $message");
 
     return Future<void>.value();
   }
@@ -32,20 +35,20 @@ class NotificationUtils {
   static Future<void> init(BuildContext context) async {
     var token = await _firebaseMessaging.getAPNSToken();
 
-    print("---------------------------");
-    print("================");
-    print("Notification setting");
-    print("================");
-    print("---------------------------");
+    log("---------------------------");
+    log("Token -> $token");
+    log("Notification setting");
+    log("================");
+    log("---------------------------");
 
     _context = context;
 
     try {
-      print("notification permission started");
+      log("notification permission started");
 
       await _firebaseMessaging.requestPermission();
     } catch (e) {
-      print("notification permission$e");
+      log("notification permission$e");
     }
     await initLocalNotifications();
     _firebaseMessaging.setForegroundNotificationPresentationOptions(
@@ -69,7 +72,7 @@ class NotificationUtils {
   static Future onSelectNotification(String? payload) async {
     /*List<String> data = [];
     data = payload?.split('+');
-    print("clicked" + payload);
+    log("clicked" + payload);
     if (payload.toString().contains("sent you")) {
       // Navigator.pushNamed(_context, ChatScreen.id);
     }
@@ -119,7 +122,7 @@ class NotificationUtils {
   //**************************************************
   static Future<void> localNotification(
       String title, String body, String payload) async {
-    print("in local notification function $title $body");
+    log("in local notification function $title $body");
     AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
       '1',
@@ -134,26 +137,26 @@ class NotificationUtils {
     NotificationDetails platformChannelSpecifics = NotificationDetails(
         android: androidPlatformChannelSpecifics,
         iOS: iosPlatformChannelSpecifics);
-    print("starting");
+    log("starting");
     await flutterLocalNotificationsPlugin
         .show(0, title, body, platformChannelSpecifics, payload: payload
             //payload: '$senderId + $notificationType',
             );
-    print("completed");
+    log("completed");
   }
 
   static Future<void> fcmSubscribe() async {
     try {
       var token = await _firebaseMessaging.getToken();
-      print("fcm token$token");
+      log("fcm token$token");
     } catch (e) {
-      print("fcm token$e");
+      log("fcm token$e");
     }
 
     var topic = FirebaseAuth.instance.currentUser?.uid ?? "sa";
-    print("subscribed $topic");
+    log("subscribed $topic");
     await _firebaseMessaging.subscribeToTopic(topic).then((value) {
-      print("subscribed");
+      log("subscribed");
     });
   }
 

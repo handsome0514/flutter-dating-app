@@ -1,10 +1,3 @@
 import 'package:get/get.dart';
 
-
-
-
-
-
-class WelcomeScreenController extends GetxController{
-
-}
+class WelcomeScreenController extends GetxController {}

@@ -1,19 +1,15 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:bematched/config.dart';
-import 'package:bematched/screens/auth/flow1_name_screen/name_screen.dart';
-import 'package:bematched/screens/auth/flow3_gender_screen/gender_screen.dart';
-import 'package:bematched/screens/auth/flow5_birth_screen/birth_screen.dart';
-import 'package:bematched/screens/auth/flow6_picture_screen/picture_screen.dart';
-import 'package:bematched/screens/auth/flow7_interest_screen/interest_screen.dart';
-import 'package:bematched/screens/auth/flow8_describe_screen/describe_screen.dart';
-import 'package:bematched/screens/auth/flow9_lcoation_screen/location_screen.dart';
-import 'package:bematched/screens/navbar_screen/navbar_screen.dart';
+
 import 'package:bematched/utils/base_controller.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:bematched/widgets/custom_dailogs.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../../models/home_user_filter_model.dart';
 import '../../../models/user_model.dart';
 import '../../../network_service/network_services.dart';
+import '../../../utils/network_utils/NetworkUtils.dart';
 import '../../admin_base_controller.dart';
 
 class LoginScreenController extends GetxController {
@@ -24,23 +20,18 @@ class LoginScreenController extends GetxController {
   //****************************************************************
   void loginIntoTheApp() async {
     //****************************************************************
+
+
     if (email.isEmpty) {
-      showOkAlertDialog(
-          context: Get.context!, title: 'Error', message: 'Email is Required');
+      CustomDailogs.okErrorAlertDialog(Get.context!, 'Email is Required');
       return;
     }
     if (password.isEmpty) {
-      showOkAlertDialog(
-          context: Get.context!,
-          title: 'Error',
-          message: 'Password is Required');
+      CustomDailogs.okErrorAlertDialog(Get.context!, 'Password is Required');
       return;
     }
     if (password.length < 8) {
-      showOkAlertDialog(
-          context: Get.context!,
-          title: 'Error',
-          message: 'Password should be greater than 8 characters');
+      CustomDailogs.okErrorAlertDialog(Get.context!, 'Password should be greater than 8 characters');
       return;
     }
 
@@ -57,58 +48,109 @@ class LoginScreenController extends GetxController {
       navigateToScreen(userDetail.flow ?? 0);
     } on AppException catch (e) {
       _baseController.hideProgress();
-      showOkAlertDialog(
-          context: Get.context!, title: 'Error', message: e.error);
+      CustomDailogs.okErrorAlertDialog(Get.context!, e.error??'Error');
     }
   }
 
-  //****************************************************************
-  void navigateToScreen(int flow) async {
-    //****************************************************************
-
-    switch (NavigationType.values[flow]) {
-      case NavigationType.NAME_FLOW:
-        Get.offAll(NameScreen());
-        break;
-      case NavigationType.GENDER_FLOW:
-        Get.offAll(GenderScreen());
-        break;
-      case NavigationType.BIRTH_FLOW:
-        Get.offAll(BirthScreen());
-        break;
-      case NavigationType.PICTURE_FLOW:
-        Get.offAll(PictureScreen());
-        break;
-      case NavigationType.INTEREST_FLOW:
-        Get.offAll(InterestScreen());
-        break;
-      case NavigationType.DESCRIBE_FLOW:
-        Get.offAll(DescribeScreen());
-        break;
-      case NavigationType.LOCATION_FLOW:
-        Get.offAll(LocationScreen());
-        break;
-      case NavigationType.SWIPE:
-        Get.offAll(NavBarScreen());
-        break;
-      default:
-        {
-          if (AdminBaseController.userData.value.isBlocked ?? false) {
-            showOkAlertDialog(
-                context: Get.context!,
-                title: 'Error',
-                message: 'Your Account is Blocked by Admin');
-
-            return;
-          }
-        /*  if ((!await Permission.location.isGranted) ||
-              (!await Permission.locationWhenInUse.serviceStatus.isEnabled)) {
-            Get.offAll(LocationPermissionScreen());
-            return;
-          }*/
-
-          Get.offAll(NavBarScreen());
-        }
+  void loginWithFacebook() async {
+    //*******************************************************************
+    _baseController.showProgress();
+    late UserCredential user;
+    try {
+      user = await signInWithFacebook();
+    } on Exception catch (e) {
+      _baseController.hideProgress();
+      print(e);
+      return;
     }
+
+    print(user.additionalUserInfo!.profile.toString());
+    UserModel? userModel = await NetWorkServices.getUserDetail();
+    _baseController.hideProgress();
+    if (userModel == null) {
+      print("user null");
+      userModel = UserModel()
+        ..uid = FirebaseAuth.instance.currentUser!.uid
+        ..profileImage = user
+            .additionalUserInfo!.profile!["picture"]["data"]["url"]
+            .toString()
+        ..email = user.additionalUserInfo!.profile!["email"];
+
+      AdminBaseController.updateUser(userModel);
+    } else {
+      print("usernot null");
+      AdminBaseController.updateUser(userModel);
+    }
+    navigateToScreen(userModel.flow ?? 0);
+    print(user);
+  }
+
+  //*******************************************************************
+  void loginWIthGoogle() async {
+    //*******************************************************************
+    _baseController.showProgress();
+
+    var user = await signInWithGoogle();
+    if (user == null) {
+      _baseController.hideProgress();
+      return;
+    }
+    UserModel? userModel = await NetWorkServices.getUserDetail();
+    _baseController.hideProgress();
+    if (userModel == null) {
+      print("user null");
+      userModel = UserModel()
+        ..uid = FirebaseAuth.instance.currentUser!.uid
+        ..email = user.additionalUserInfo!.profile!["email"];
+      AdminBaseController.updateUser(userModel);
+    } else {
+      print("usernot null");
+      _baseController.hideProgress();
+      AdminBaseController.updateUser(userModel);
+    }
+    navigateToScreen(userModel.flow ?? 0);
+  }
+
+  //**********************************************************
+  Future<UserCredential?> signInWithGoogle() async {
+    //**********************************************************
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+      final GoogleSignInAuthentication? googleAuth =
+          await googleUser?.authentication;
+      if ((googleAuth?.accessToken ?? '').isEmpty ||
+          (googleAuth?.idToken ?? '').isEmpty) {
+        _baseController.hideProgress();
+        return null;
+      }
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth?.accessToken,
+        idToken: googleAuth?.idToken,
+      );
+      return await FirebaseAuth.instance.signInWithCredential(credential);
+    } on Exception catch (e) {
+      print(e.toString());
+      _baseController.hideProgress();
+      return null;
+    }
+  }
+
+  //**********************************************************
+  Future<UserCredential> signInWithFacebook() async {
+    //**********************************************************
+    final LoginResult loginResult = await FacebookAuth.instance.login();
+    final OAuthCredential facebookAuthCredential =
+        FacebookAuthProvider.credential(loginResult.accessToken?.token ?? "");
+
+    var userCredentials = await FirebaseAuth.instance
+        .signInWithCredential(facebookAuthCredential);
+    var api = await NetworkUtil.internal().get("",
+        baseURL:
+            "https://graph.facebook.com/v2.12/me?fields=name,picture.width(800).height(800),first_name,last_name,email&access_token=${loginResult.accessToken?.token ?? ""}");
+    print(api);
+    userCredentials.additionalUserInfo!.profile!["picture"]["data"]["url"] =
+        api["picture"]["data"]["url"];
+    return userCredentials;
   }
 }

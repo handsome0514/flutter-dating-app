@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "2385713801",
-    "project_id": "bematch-5d104",
-    "storage_bucket": "bematch-5d104.appspot.com"
+    "project_number": "776601076111",
+    "project_id": "bematched-1e882",
+    "storage_bucket": "bematched-1e882.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:2385713801:android:91ed38a2c5c9920b928458",
+        "mobilesdk_app_id": "1:776601076111:android:6d2989a189867421e3cbfa",
         "android_client_info": {
           "package_name": "com.dating.bematched"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyA2DwdnanDHU0w2nDgo84XHmcCOGAgBy-Y"
+          "current_key": "AIzaSyB8s41REUpoXdtzM200ahpLRzqKpmVX42Y"
         }
       ],
       "services": {

@@ -3,9 +3,6 @@ import 'package:bematched/screens/auth/login_screen/login_screen.dart';
 import 'package:bematched/screens/auth/signup_screen/signup_screen.dart';
 import 'package:bematched/widgets/custom_button.dart';
 import '../../utils/constants.dart';
-import '../auth/flow1_name_screen/name_screen.dart';
-
-
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -62,13 +59,13 @@ class WelcomeScreenState extends State<WelcomeScreen> {
               GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: () {
-                  Get.to(() =>  LoginScreen());
+                  Get.to(() => LoginScreen());
                 },
                 child: Text(
                   AppLanguage.LOGIN,
                   style: GoogleFonts.abhayaLibre(
                     textStyle: const TextStyle(
-                      fontSize: 39,
+                      fontSize: 30,
                       color: AppColors.themeColor,
                       fontWeight: FontWeight.w500,
                     ),

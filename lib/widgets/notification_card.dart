@@ -1,9 +1,8 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:bematched/utils/constants.dart';
 import 'package:flutter/material.dart';
 
 class NotificationCard extends StatelessWidget {
-  const NotificationCard({Key? key}) : super(key: key);
+  const NotificationCard({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +35,6 @@ class NotificationCard extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-
                 ],
               ),
               SizedBox(width: 4),

@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../screens/subscription/subscriptionPlan_screen2/subscriptionPlan_screen2.dart';
+import '../screens/subscription/subscriptionPlan_screen2/subscription_plan_screen2.dart';
 import '../utils/constants.dart';
 
 class SubScriptionCard extends StatelessWidget {
-  SubScriptionCard(
-      {Key? key,
-      required this.label,
-      required this.price,
-      required this.description,
-      this.recomendationlabel})
-      : super(key: key);
+  const SubScriptionCard({
+    super.key,
+    required this.label,
+    required this.price,
+    required this.description,
+    this.recomendationlabel,
+  });
+
   final String label;
   final String? recomendationlabel;
   final String description;
@@ -53,7 +54,7 @@ class SubScriptionCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Padding(
-              padding: EdgeInsets.only(left: 23, right: 23),
+              padding: const EdgeInsets.only(left: 23, right: 23),
               child: Text(
                 description,
                 style: const TextStyle(
@@ -71,7 +72,7 @@ class SubScriptionCard extends StatelessWidget {
               //  mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  '\$${price}',
+                  '\$$price',
                   style: const TextStyle(
                     fontSize: 32,
                     fontFamily: AppFonts.INTER_SEMIBOLD,
@@ -99,7 +100,7 @@ class SubScriptionCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   fontFamily: AppFonts.INTER_REGULAR,
-                  color:  Color(0xff162534),
+                  color: Color(0xff162534),
                 ),
                 textAlign: TextAlign.center,
               ),

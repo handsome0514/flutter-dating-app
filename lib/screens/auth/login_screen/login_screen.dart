@@ -1,12 +1,10 @@
 import 'package:bematched/config.dart';
 import 'package:bematched/screens/auth/login_screen/login_screen_controller.dart';
-import 'package:bematched/screens/home_screen/home_screen.dart';
-import 'package:bematched/screens/navbar_screen/navbar_screen.dart';
+import 'package:bematched/screens/auth/phone_screen/phone_screen.dart';
 import 'package:bematched/utils/constants.dart';
 import 'package:bematched/widgets/custom_button.dart';
 import 'package:bematched/widgets/custom_textfield.dart';
 import 'package:bematched/widgets/singlechild_spacer_widget.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -62,9 +60,10 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                 CustomTextField(
+                CustomTextField(
                   hintLabel: 'Enter your Password',
                   onChanged: (val) => _controller.password = val,
+                  isPassword: true,
                 ),
                 const SizedBox(height: 31),
                 Row(
@@ -109,53 +108,89 @@ class LoginScreen extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 31),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.only(top: 19, bottom: 19),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: const Color(0xff1877F2)),
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SvgPicture.asset(SvgAssets.FACEBOOK_ICON),
-                      const SizedBox(width: 16),
-                      const Text(
-                        'Sign up with Facebook',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontFamily: AppFonts.INTER_MEDIUM,
-                          color: Colors.black,
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => Get.to(() => PhoneScreen()),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.only(top: 19, bottom: 19),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: const Color(0xff1877F2)),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Row(
+                      children: [
+                        SizedBox(width: Get.width * 0.20),
+                        const Icon(Icons.phone),
+                        const SizedBox(width: 16),
+                        const Text(
+                          'Sign up with Phone',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontFamily: AppFonts.INTER_MEDIUM,
+                            color: Colors.black,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: 13),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.only(top: 19, bottom: 19),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: const Color(0xffF1574A)),
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SvgPicture.asset(SvgAssets.GOOGLE_ICON),
-                      const SizedBox(width: 16),
-                      const Text(
-                        'Sign up with Gmail',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontFamily: AppFonts.INTER_MEDIUM,
-                          color: Colors.black,
+/*                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: _controller.loginWithFacebook,
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.only(top: 19, bottom: 19),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: const Color(0xff1877F2)),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Row(
+                      children: [
+                        SizedBox(width: Get.width * 0.20),
+                        SvgPicture.asset(SvgAssets.FACEBOOK_ICON),
+                        const SizedBox(width: 16),
+                        const Text(
+                          'Sign up with Facebook',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontFamily: AppFonts.INTER_MEDIUM,
+                            color: Colors.black,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
+                ),*/
+                /*    const SizedBox(height: 13),
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: _controller.loginWIthGoogle,
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.only(top: 19, bottom: 19),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: const Color(0xffF1574A)),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Row(
+                      children: [
+                        SizedBox(width: Get.width * 0.20),
+                        SvgPicture.asset(SvgAssets.GOOGLE_ICON),
+                        const SizedBox(width: 16),
+                        const Text(
+                          'Sign up with Gmail',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontFamily: AppFonts.INTER_MEDIUM,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),*/
                 const SizedBox(height: 55),
                 const Spacer(),
                 CustomButton(

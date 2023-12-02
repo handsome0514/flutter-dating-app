@@ -1,7 +1,5 @@
 import 'package:bematched/screens/splash_screen/splash_screen.dart';
-import 'package:bematched/screens/welcome_screen/welcome_screen.dart';
 import 'package:bematched/utils/constants.dart';
-
 import 'config.dart';
 
 Future<void> main() async {
@@ -18,7 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-     onTap: () => FocusManager.instance.primaryFocus!.unfocus(),
+      onTap: () => FocusManager.instance.primaryFocus!.unfocus(),
       child: GetMaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'BeMatched',

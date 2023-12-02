@@ -8,14 +8,20 @@ class BFFBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return const Column(
       children: [
-        SwipeCard(image: ImageAssets.DUMY_IMAGE,),
-        SwipeCard(image: ImageAssets.DUMY_IMAGE1,),
-        SwipeCard(image: ImageAssets.DUMY_IMAGE,),
-        SwipeCard(image: ImageAssets.DUMY_IMAGE1,),
-
-
+        SwipeCard(
+          image: ImageAssets.DUMY_IMAGE,
+        ),
+        SwipeCard(
+          image: ImageAssets.DUMY_IMAGE1,
+        ),
+        SwipeCard(
+          image: ImageAssets.DUMY_IMAGE,
+        ),
+        SwipeCard(
+          image: ImageAssets.DUMY_IMAGE1,
+        ),
       ],
     );
   }

@@ -1,17 +1,29 @@
 import 'package:bematched/config.dart';
+import 'package:bematched/screens/admin_base_controller.dart';
 import 'package:bematched/screens/welcome_screen/welcome_screen.dart';
-import 'package:get/get.dart';
+import 'package:bematched/widgets/custom_dailogs.dart';
 
 class SettingScreenController extends GetxController {
-  Rx<bool> isIncognito = Rx(false);
-  Rx<bool> isNewMessage = Rx(false);
-  Rx<bool> isNewMatch = Rx(false);
-  Rx<bool> getNofifiedinApp = Rx(false);
-  Rx<bool> getNotifiedinGmail = Rx(false);
+  var userModel = AdminBaseController.userData.value;
+  Rx<bool> isDate = Rx(true);
+  Rx<bool> sendPushNotifications = Rx(true);
+  Rx<bool> newMessages = Rx(true);
+  Rx<bool> newMatches = Rx(true);
+
+  initData() {
+    userModel = AdminBaseController.userData.value;
+    isDate.value = userModel.isDate ?? true;
+    update();
+  }
+
+  @override
+  void onInit() {
+    initData();
+    // TODO: implement onInit
+    super.onInit();
+  }
 
   void signOut() {
-    FirebaseAuth.instance
-        .signOut()
-        .then((value) => Get.offAll(() => WelcomeScreen()));
+    CustomDailogs.logoutAccount(Get.context!);
   }
 }

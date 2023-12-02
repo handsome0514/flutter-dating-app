@@ -1,59 +1,120 @@
-import 'package:bematched/screens/home_screen/home_screen_controller.dart';
-import 'package:bematched/screens/profile_screen/profile_screen.dart';
-import 'package:bematched/widgets/date_swipe_card.dart';
-import 'package:bematched/widgets/filter_bottomsheet.dart';
-import 'package:flutter_card_swiper/flutter_card_swiper.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:swipe_cards/swipe_cards.dart';
+import 'dart:developer';
 
+import 'package:bematched/screens/home_screen/home_screen_controller.dart';
+import 'package:bematched/utils/base_controller.dart';
+import 'package:bematched/utils/constants.dart';
+import 'package:bematched/widgets/date_swipe_card.dart';
+import 'package:bematched/widgets/no_record_found.dart';
+import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import '../../config.dart';
-import '../../utils/constants.dart';
+import '../../network_service/network_services.dart';
 
 class DateBox extends StatelessWidget {
-  DateBox({super.key});
-
-  final _controller = Get.find<HomeScreenController>();
+  const DateBox({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Align(
-          alignment: Alignment.topRight,
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: () {
-              Get.bottomSheet(
-                FilterBottomSheet(),
-                isScrollControlled: true,
-                persistent: false,
-                enableDrag: true,
-              );
-            },
-            child: Container(
-                margin: const EdgeInsets.only(right: 8),
-                decoration: BoxDecoration(
-                  color: AppColors.whiteColor,
-                  border: Border.all(color: const Color(0xffE8E6EA)),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                padding: const EdgeInsets.only(
-                    top: 14, bottom: 14, left: 14, right: 13),
-                child: SvgPicture.asset(SvgAssets.FILTER_ICON)),
-          ),
-        ),
-        const SizedBox(height: 25),
-        SizedBox(
-          height: 523,
-          child: CardSwiper(
-            padding: const EdgeInsets.only(left: 8,right: 30),
-            numberOfCardsDisplayed: 3,
-            cardsCount:5,
+    return SizedBox(
+      height: 523,
+      child: GetBuilder<HomeScreenController>(
+        builder: (controller) {
+          if ((controller.userModel.isDate ?? true) == false &&
+              controller.userModel.connectionStatus == 0) {
+            return Container(
+              margin: const EdgeInsets.only(left: 8, right: 8),
+              padding: EdgeInsets.only(left: 8,right: 8),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.BLACK.withOpacity(.3))),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Center(
+                    child: Text(
+                      'You disabled Date mode',
+                      style: TextStyle(
+                          fontFamily: AppFonts.INTER_SEMIBOLD,
+                          color: AppColors.BLACK,
+                          fontSize: 22),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Center(
+                    child: Text(
+                      'Other people can\'t see your profile.Ready to return to dating?',
+                      style: TextStyle(
+                        fontFamily: AppFonts.INTER_SEMIBOLD,
+                        color: AppColors.BLACK.withOpacity(.4),
+                        fontSize: 17,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+                  GestureDetector(
+                    onTap: (){
+                      NetWorkServices.updateIsDate(true);
+                      controller.loadUser();
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.only(top: 12.5, bottom: 12.5),
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: AppColors.themeColor,
+                      ),
+                      child: const Center(
+                        child: Text(
+                          'Enable Date Mode',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: AppFonts.INTER_MEDIUM,
+                            color: AppColors.whiteColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+          if (controller.isLoading.value) {
+            return const NativeProgress();
+          }
+          if (controller.isLoading.value == false && controller.list.isEmpty) {
+            return const NoRecordFound();
+          }
+          log('Length>>>${controller.list.length}');
+          return CardSwiper(
+            controller: controller.swiperController,
+            padding: const EdgeInsets.only(left: 8, right: 30),
+            numberOfCardsDisplayed:
+                controller.list.length >= 3 ? 3 : controller.list.length,
+            cardsCount: controller.list.length,
             backCardOffset: const Offset(30, 0),
-            cardBuilder: (context, index, percentThresholdX, percentThresholdY) => const DateSwipeCard(),
-          ),
-        ),
-      ],
+            cardBuilder:
+                (context, index, percentThresholdX, percentThresholdY) =>
+                    DateSwipeCard(userModel: controller.list[index]),
+            onSwipe: (index, i, direction) {
+              log('index>>$index');
+              log('Direction>> $direction');
+              if (direction == CardSwiperDirection.right) {
+                controller.likeUser(controller.list[index]);
+              }
+              if (direction == CardSwiperDirection.left) {
+                controller.disLikeUser(controller.list[index]);
+              }
+              return true;
+            },
+            onEnd: () => controller.loadUser(),
+            allowedSwipeDirection:
+                AllowedSwipeDirection.only(left: true, right: true),
+            isLoop: false,
+          );
+        },
+      ),
     );
   }
 }
