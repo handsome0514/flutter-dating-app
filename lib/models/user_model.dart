@@ -373,8 +373,7 @@ class LocationPoint {
   }
 }
 
-class newLatLng{
+class newLatLng {
   double? latitude;
   double? longitude;
-
 }

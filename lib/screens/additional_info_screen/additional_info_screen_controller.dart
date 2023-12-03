@@ -33,14 +33,14 @@ class AdditionalInfoScreenController extends GetxController {
 
   initData() {
     var userModel = AdminBaseController.userData.value;
-    height.value = userModel.height ?? 'Add';
-    educationLevel.value = userModel.educationLevel ?? 'Add';
-    drinking.value = userModel.drinking ?? 'Add';
-    smoking.value = userModel.smoking ?? 'Add';
-    relationship.value = userModel.relationship ?? 'Add';
-    zodiacSign.value = userModel.zodiacSign ?? 'Add';
-    industry.value = userModel.industry ?? 'Add';
-    yearOfExperience.value = userModel.yearsOfExperience ?? 'Add';
+    height.value = userModel.height ?? '';
+    educationLevel.value = userModel.educationLevel ?? '';
+    drinking.value = userModel.drinking ?? '';
+    smoking.value = userModel.smoking ?? '';
+    relationship.value = userModel.relationship ?? '';
+    zodiacSign.value = userModel.zodiacSign ?? '';
+    industry.value = userModel.industry ?? '';
+    yearOfExperience.value = userModel.yearsOfExperience ?? '';
     work.value = userModel.work ?? '';
   }
 

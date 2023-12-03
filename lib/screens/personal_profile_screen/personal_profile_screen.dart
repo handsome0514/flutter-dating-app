@@ -511,7 +511,7 @@ class PersonalProfileScreen extends StatelessWidget {
                             children: [
                               BioButton(
                                 leading: 'Height',
-                                suffix: _controller.userModel.height ?? 'Add',
+                                suffix: _controller.userModel.height ?? '',
                                 isMyProfile: true,
                               ),
                               const SizedBox(height: 17),
@@ -522,7 +522,7 @@ class PersonalProfileScreen extends StatelessWidget {
                             BioButton(
                               leading: 'Education level',
                               suffix:
-                                  _controller.userModel.educationLevel ?? 'Add',
+                                  _controller.userModel.educationLevel ?? '',
                               isMyProfile: true,
                             ),
                             const SizedBox(height: 17),
@@ -535,7 +535,7 @@ class PersonalProfileScreen extends StatelessWidget {
                             children: [
                               BioButton(
                                 leading: 'Drinking',
-                                suffix: _controller.userModel.drinking ?? 'Add',
+                                suffix: _controller.userModel.drinking ?? '',
                                 isMyProfile: true,
                               ),
                               const SizedBox(height: 17),
@@ -548,7 +548,7 @@ class PersonalProfileScreen extends StatelessWidget {
                             children: [
                               BioButton(
                                 leading: 'Smoking',
-                                suffix: _controller.userModel.smoking ?? 'Add',
+                                suffix: _controller.userModel.smoking ?? '',
                                 isMyProfile: true,
                               ),
                               const SizedBox(height: 17),
@@ -560,7 +560,7 @@ class PersonalProfileScreen extends StatelessWidget {
                               BioButton(
                                 leading: 'Relationship',
                                 suffix:
-                                    _controller.userModel.relationship ?? 'Add',
+                                    _controller.userModel.relationship ?? '',
                                 isMyProfile: true,
                               ),
                               const SizedBox(height: 17),
@@ -570,7 +570,7 @@ class PersonalProfileScreen extends StatelessWidget {
                           children: [
                             BioButton(
                               leading: 'Industry',
-                              suffix: _controller.userModel.industry ?? 'Add',
+                              suffix: _controller.userModel.industry ?? '',
                               isMyProfile: true,
                             ),
                             const SizedBox(height: 17),
@@ -583,7 +583,7 @@ class PersonalProfileScreen extends StatelessWidget {
                                 leading: 'Years of experience',
                                 suffix:
                                     _controller.userModel.yearsOfExperience ??
-                                        'Add',
+                                        '',
                                 isMyProfile: true,
                               ),
                               const SizedBox(height: 17),
@@ -596,8 +596,7 @@ class PersonalProfileScreen extends StatelessWidget {
                             children: [
                               BioButton(
                                 leading: 'Zodiac sign',
-                                suffix:
-                                    _controller.userModel.zodiacSign ?? 'Add',
+                                suffix: _controller.userModel.zodiacSign ?? '',
                                 isMyProfile: true,
                               ),
                             ],

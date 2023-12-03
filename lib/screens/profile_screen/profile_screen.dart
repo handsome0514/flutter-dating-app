@@ -543,8 +543,8 @@ class ProfileScreen extends StatelessWidget {
                                 children: [
                                   BioButton(
                                       leading: 'Height',
-                                      suffix: _controller.userModel.height ??
-                                          'Add'),
+                                      suffix:
+                                          _controller.userModel.height ?? ''),
                                   const SizedBox(height: 17),
                                 ],
                               ),
@@ -557,7 +557,7 @@ class ProfileScreen extends StatelessWidget {
                                       leading: 'Education level',
                                       suffix: _controller
                                               .userModel.educationLevel ??
-                                          'Add'),
+                                          ''),
                                   const SizedBox(height: 17),
                                 ],
                               ),
@@ -572,8 +572,8 @@ class ProfileScreen extends StatelessWidget {
                                 children: [
                                   BioButton(
                                       leading: 'Drinking',
-                                      suffix: _controller.userModel.drinking ??
-                                          'Add'),
+                                      suffix:
+                                          _controller.userModel.drinking ?? ''),
                                   const SizedBox(height: 17),
                                 ],
                               ),
@@ -588,8 +588,8 @@ class ProfileScreen extends StatelessWidget {
                                 children: [
                                   BioButton(
                                       leading: 'Smoking',
-                                      suffix: _controller.userModel.smoking ??
-                                          'Add'),
+                                      suffix:
+                                          _controller.userModel.smoking ?? ''),
                                   const SizedBox(height: 17),
                                 ],
                               ),
@@ -604,7 +604,7 @@ class ProfileScreen extends StatelessWidget {
                                       leading: 'Relationship',
                                       suffix:
                                           _controller.userModel.relationship ??
-                                              'Add'),
+                                              ''),
                                   const SizedBox(height: 17),
                                 ],
                               ),
@@ -614,8 +614,8 @@ class ProfileScreen extends StatelessWidget {
                                 children: [
                                   BioButton(
                                       leading: 'Industry',
-                                      suffix: _controller.userModel.industry ??
-                                          'Add'),
+                                      suffix:
+                                          _controller.userModel.industry ?? ''),
                                   const SizedBox(height: 17),
                                 ],
                               ),
@@ -630,7 +630,7 @@ class ProfileScreen extends StatelessWidget {
                                       leading: 'Years of experience',
                                       suffix: _controller
                                               .userModel.yearsOfExperience ??
-                                          'Add'),
+                                          ''),
                                   const SizedBox(height: 17),
                                 ],
                               ),
@@ -647,7 +647,7 @@ class ProfileScreen extends StatelessWidget {
                                       leading: 'Zodiac sign',
                                       suffix:
                                           _controller.userModel.zodiacSign ??
-                                              'Add'),
+                                              ''),
                                 ],
                               ),
                           ],
