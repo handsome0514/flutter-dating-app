@@ -44,14 +44,15 @@ class ImageLoader {
         final imageBytes = fileResponse.file.readAsBytesSync();
 
         state = LoadState.success;
-        PaintingBinding.instance.instantiateImageCodec(imageBytes).then(
-            (codec) {
-          frames = codec;
-          onComplete();
-        }, onError: (error) {
-          state = LoadState.failure;
-          onComplete();
-        });
+        // FIXME: Pagination
+        // PaintingBinding.instance.instantiateImageCodec(imageBytes).then(
+        //     (codec) {
+        //   frames = codec;
+        //   onComplete();
+        // }, onError: (error) {
+        //   state = LoadState.failure;
+        //   onComplete();
+        // });
       },
       onError: (error) {
         state = LoadState.failure;
