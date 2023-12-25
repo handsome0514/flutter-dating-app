@@ -17,19 +17,19 @@ class BioButton extends StatelessWidget {
      behavior: HitTestBehavior.opaque,
       onTap: (){
        if(isMyProfile == false)return;
-       Get.to(
-             () => AdditionalInfoScreen(),
-         transition: Transition.rightToLeft,
-       );
+      //  Get.to(
+      //        () => AdditionalInfoScreen(),
+      //    transition: Transition.rightToLeft,
+      //  );
 
       },
       child: Container(
         padding: const EdgeInsets.only(bottom: 16),
-        decoration: BoxDecoration(
-          border: Border(
-              bottom:
-                  BorderSide(color: const Color(0xffE4E4E4).withOpacity(.55))),
-        ),
+        // decoration: BoxDecoration(
+        //   border: Border(
+        //       bottom:
+        //           BorderSide(color: const Color(0xffE4E4E4).withOpacity(.55))),
+        // ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -49,18 +49,20 @@ class BioButton extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 16,
                     fontFamily: AppFonts.INTER_MEDIUM,
-                    color: AppColors.themeColor,
+                    color: AppColors.BLACK,
+                    // color: AppColors.themeColor,
+
                   ),
                 ),
-                const SizedBox(width: 13),
-                Transform.flip(
-                  flipX: true,
-                  child: const Icon(
-                    Icons.arrow_back_ios_new,
-                    color: AppColors.themeColor,
-                    size: 18,
-                  ),
-                ),
+                // const SizedBox(width: 13),
+                // Transform.flip(
+                //   flipX: true,
+                //   child: const Icon(
+                //     Icons.arrow_back_ios_new,
+                //     color: AppColors.themeColor,
+                //     size: 18,
+                //   ),
+                // ),
               ],
             ),
           ],

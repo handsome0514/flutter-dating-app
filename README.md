@@ -1,6 +1,6 @@
-# bematched
+# Dating
 
-A new Flutter project.
+Flutter Dating App
 
 ## Getting Started
 

@@ -439,66 +439,52 @@ class PersonalProfileScreen extends StatelessWidget {
                                       color: AppColors.BLACK,
                                     ),
                                   ),
-                                  GestureDetector(
-                                    behavior: HitTestBehavior.opaque,
-                                    onTap: () {
-                                      Get.to(
-                                        () => AdditionalInfoScreen(),
-                                        transition: Transition.rightToLeft,
-                                      );
-                                    },
-                                    child: SizedBox(
-                                      width: 160,
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                        children: [
-                                          if (_controller
-                                                  .userModel.work?.isNotEmpty ??
-                                              false)
-                                            Expanded(
-                                              child: Text(
-                                                _controller.userModel.work ??
-                                                    '',
-                                                style: const TextStyle(
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.end,
+                                    children: [
+                                      if (_controller
+                                              .userModel.work?.isNotEmpty ??
+                                          false)
+                                        Text(
+                                          _controller.userModel.work ??
+                                              '',
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontFamily:
+                                                AppFonts.INTER_MEDIUM,
+                                            color: AppColors.BLACK,
+                                          ),
+                                        )
+                                      else
+                                        const Expanded(
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                '',
+                                                style: TextStyle(
                                                   fontSize: 16,
                                                   fontFamily:
                                                       AppFonts.INTER_MEDIUM,
-                                                  color: AppColors.themeColor,
+                                                  color:
+                                                      AppColors.BLACK,
                                                 ),
                                               ),
-                                            )
-                                          else
-                                            const Expanded(
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.end,
-                                                children: [
-                                                  Text(
-                                                    'Add',
-                                                    style: TextStyle(
-                                                      fontSize: 16,
-                                                      fontFamily:
-                                                          AppFonts.INTER_MEDIUM,
-                                                      color:
-                                                          AppColors.themeColor,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          const SizedBox(width: 13),
-                                          Transform.flip(
-                                            flipX: true,
-                                            child: const Icon(
-                                              Icons.arrow_back_ios_new,
-                                              color: AppColors.themeColor,
-                                              size: 18,
-                                            ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
-                                    ),
+                                        ),
+                                      // const SizedBox(width: 13),
+                                      // Transform.flip(
+                                      //   flipX: true,
+                                      //   child: const Icon(
+                                      //     Icons.arrow_back_ios_new,
+                                      //     color: AppColors.themeColor,
+                                      //     size: 18,
+                                      //   ),
+                                      // ),
+                                    ],
                                   ),
                                 ],
                               ),

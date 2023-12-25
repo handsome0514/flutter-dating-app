@@ -505,7 +505,7 @@ class ProfileScreen extends StatelessWidget {
                                                       MainAxisAlignment.end,
                                                   children: [
                                                     Text(
-                                                      'Add',
+                                                      '',
                                                       style: TextStyle(
                                                         fontSize: 16,
                                                         fontFamily: AppFonts
